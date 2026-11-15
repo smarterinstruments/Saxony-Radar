@@ -1,0 +1,17 @@
+# Saxony Radar – Vorschau / preview
+
+**Radar der Halbleiter-Wertschöpfungskette – Sachsen.** Wöchentlicher Radar der öffentlichen Aktivitäten von Unternehmen und Instituten des sächsischen Halbleiter-Ökosystems, erstellt vom Czech National Semiconductor Cluster (CNSC) für Silicon Saxony im Rahmen der Absichtserklärung vom 12. 11. 2026.
+
+**Semiconductor Value Chain Radar – Saxony.** Weekly radar of public activities of companies and institutes in the Saxon semiconductor ecosystem, prepared by the Czech National Semiconductor Cluster (CNSC) for Silicon Saxony under the memorandum of understanding of 12 Nov 2026.
+
+- Seite / page: `index.html` (Sprachen: DE, EN, CZ)
+- Daten / data: `data/radar_sx.json`
+- Build: `python3 tools/build_sx.py` (Vorlage / template: `tools/template.html`, abgeleitet vom CNSC Member Activity Radar)
+
+## Stand / status (Ausgabe W46/2026, 15. 11. 2026)
+
+- 480 Organisationen aus dem öffentlichen Mitgliederverzeichnis von Silicon Saxony, zugeordnet zu 27 Codes der CNSC-Taxonomie der Wertschöpfungskette (10 Sektoren, Untersegmente 2.4.1–2.4.6). Die Zuordnung ist vorläufig und wartet auf die Bestätigung durch Silicon Saxony.
+- 48 Meldungen und 5 Termine, bisher nur von den öffentlichen LinkedIn-Seiten von 33 ausgewählten Unternehmen und Instituten. Alle Meldungstexte sind eigene Zusammenfassungen, keine Zitate.
+- Nur öffentliche Informationen; keine personenbezogenen Daten von Ansprechpartnern, keine internen Cluster-Informationen.
+
+Korrekturen und Ergänzungen / corrections and additions: info@semicz.cz, Betreff „Radar Sachsen“.

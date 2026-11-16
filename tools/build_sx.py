@@ -48,7 +48,8 @@ rep=[("<title>CNSC Member Activity Radar</title>","<title>Semiconductor Value Ch
 ("if (['en','de','zh','nl'].includes(_h0))","if (['en','cs'].includes(_h0))"),
 ("[['cs','CZ'],['en','EN'],['de','DE'],['nl','NL'],['zh','中文']]","[['de','DE'],['en','EN'],['cs','CZ']]"),
 ("['cs','en','de','nl','zh'].forEach","['de','en','cs'].forEach"),
-("['overview','news','members','centres','events','about']","['overview','news','members','events','about']"),
+("['overview','news','members','centres','events','about']","['overview','map','news','members','events','about']"),
+("if (['news','members','centres','events','about'].includes(hash))","if (['map','news','members','centres','events','about'].includes(hash))"),
 ("subject=CNSC%20Radar%20%E2%80%93%20zp%C4%9Btn%C3%A1%20vazba","subject=Radar%20hodnotov%C3%A9ho%20%C5%99et%C4%9Bzce%20%E2%80%93%20zp%C4%9Btn%C3%A1%20vazba")]
 for a,b in rep:
     assert a in T, a[:60]
@@ -93,6 +94,75 @@ for i,k in enumerate(keys):
     if isinstance(v,list): parts.append(f'  {dump(k)}: [\n'+',\n'.join(f'    {dump(x)}' for x in v)+f'\n  ]{end}')
     else: parts.append(f'  {dump(k)}: {dump(v)}{end}')
 body=('{\n'+'\n'.join(parts)+'\n}').replace('</','<\\/')
+
+# ---- value-chain map tab ----
+T=T.replace("tabs:['Přehled','Novinky',","tabs:['Přehled','Mapa hodnotového řetězce','Novinky',",1)
+T=T.replace("tabs:['Overview','News',","tabs:['Overview','Value chain map','News',",1)
+T=T.replace("tabs:['Überblick','Meldungen',","tabs:['Überblick','Wertschöpfungskette','Meldungen',",1)
+MAP_CSS=""".vcmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:start}
+.vc-stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px 12px;min-width:0}
+.vc-stage.wide{grid-column:1/-1}
+.vc-stage h3{margin:0 0 2px;font-size:14px;letter-spacing:.01em}
+.vc-stage .vc-n{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);margin-bottom:8px}
+.vc-seg{border-top:1px solid var(--line);padding:8px 0 4px}
+.vc-seg:first-of-type{border-top:0}
+.vc-seg h4{margin:0 0 6px;font-size:12px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.vc-seg h4 code{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent);margin-right:6px}
+.vc-chips{display:flex;flex-wrap:wrap;gap:4px}
+.vc-chip{font:12px/1.1 inherit;padding:4px 7px 4px 6px;border:1px solid var(--line);border-left:3px solid var(--c,var(--accent));border-radius:7px;background:transparent;color:inherit;cursor:pointer;max-width:100%;text-align:left}
+.vc-chip:hover{background:var(--line)}
+.vc-chip.r1{box-shadow:inset 0 0 0 1px var(--ring1);font-weight:600}
+.vc-chip.r2{box-shadow:inset 0 0 0 1px var(--ring2)}
+.vc-chip .d{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--ring4)}
+.vc-chip.r1 .d{background:var(--ring1)}.vc-chip.r2 .d{background:var(--ring2)}
+.vc-flow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 12px;color:var(--muted);font-size:12px}
+.vc-flow b{color:inherit;font-weight:600}
+.vc-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:12px 0 0}
+.card.hl{outline:2px solid var(--accent);outline-offset:2px}
+@media (min-width:1100px){.vcmap{grid-template-columns:repeat(4,1fr)}}
+"""
+T=T.replace("</style>",MAP_CSS+"</style>",1)
+MAP_HTML="""  <section class="panel" id="p-map" role="tabpanel">
+    <h2 id="mapH"></h2>
+    <p class="sub" id="mapSub"></p>
+    <div class="vc-flow" id="vcflow"></div>
+    <div class="vcmap" id="vcmap"></div>
+    <div class="vc-legend" id="vclegend"></div>
+  </section>
+"""
+T=T.replace('  <section class="panel" id="p-news" role="tabpanel">',MAP_HTML+'  <section class="panel" id="p-news" role="tabpanel">',1)
+MAP_JS=r"""
+const MAPT={cs:{h:'Mapa hodnotového řetězce',sub:'Všechny organizace na jednom obrázku, uspořádané podle taxonomie CNSC: sloupce jsou fáze řetězce, boxy segmenty, štítky jednotlivé firmy a instituce. Kliknutím na štítek otevřete kartu organizace. Tečka ukazuje čerstvost poslední veřejné aktivity (tmavá: tento týden, střední: tento měsíc, světlá: starší nebo zatím nesledováno).',legend:['tento týden','tento měsíc','starší nebo zatím nesledováno'],flow:'Tok hodnotového řetězce'},
+ en:{h:'Value chain map',sub:'All organisations in one picture, arranged by the CNSC taxonomy: columns are stages of the chain, boxes are segments, chips are individual companies and institutes. Click a chip to open the organisation card. The dot shows the freshness of the last public activity (dark: this week, medium: this month, light: older or not yet tracked).',legend:['this week','this month','older or not yet tracked'],flow:'Value chain flow'},
+ de:{h:'Wertschöpfungskette',sub:'Alle Organisationen in einem Bild, geordnet nach der CNSC-Taxonomie: Spalten sind Stufen der Kette, Kästen die Segmente, Chips die einzelnen Unternehmen und Institute. Klick auf einen Chip öffnet die Organisationskarte. Der Punkt zeigt die Aktualität der letzten öffentlichen Aktivität (dunkel: diese Woche, mittel: diesen Monat, hell: älter oder noch nicht erfasst).',legend:['diese Woche','diesen Monat','älter oder noch nicht erfasst'],flow:'Fluss der Wertschöpfungskette'}};
+const MAPG=[
+ {id:'design',codes:['1.1','1.2','1.3','1.4'],t:{cs:'1 Návrh a software',en:'1 Design & software',de:'1 Design & Software'}},
+ {id:'equip',codes:['2.1','2.2','2.3'],t:{cs:'2 Zařízení a metrologie',en:'2 Equipment & metrology',de:'2 Anlagen & Messtechnik'}},
+ {id:'subsys',codes:['2.4.1','2.4.2','2.4.3','2.4.4','2.4.5','2.4.6','2.5','F'],t:{cs:'2.4 Subsystémy, služby, infrastruktura',en:'2.4 Subsystems, services & fab infrastructure',de:'2.4 Subsysteme, Dienstleistungen, Fab-Infrastruktur'}},
+ {id:'materials',codes:['3.1','3.2'],t:{cs:'3 Materiály',en:'3 Materials',de:'3 Materialien'}},
+ {id:'fab',codes:['4.2','4.3','4.4','4.5','4.6'],t:{cs:'4 Výroba čipů',en:'4 Chip manufacturing',de:'4 Chipfertigung'}},
+ {id:'pack',codes:['5.1','5.2','5.3'],t:{cs:'5 Pouzdření a test',en:'5 Packaging & test',de:'5 Packaging & Test'}},
+ {id:'apps',codes:['6.1','6.2','6.3','6.4','6.5','6.6','D'],t:{cs:'6 Aplikace a distribuce',en:'6 Applications & distribution',de:'6 Anwendungen & Distribution'}},
+ {id:'eco',codes:['7.1','7.2','7.3'],wide:true,t:{cs:'7 Výzkum, vzdělávání, politika a klastry',en:'7 Research, skills, policy & clusters',de:'7 Forschung, Bildung, Politik & Cluster'}}];
+function segName(m){ return String(L({cs:m.cs,en:m.en,de:m.de})).replace(/^[^ ]+ /,'').split(' (')[0]; }
+function goMember(id){ showTab('members'); const el=document.getElementById('member-'+id); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'center'}); document.querySelectorAll('.card.hl').forEach(c=>c.classList.remove('hl')); el.classList.add('hl'); setTimeout(()=>el.classList.remove('hl'),4000); }
+function renderMap(){
+  const t=MAPT[LANG]||MAPT.en; $('mapH').textContent=t.h; $('mapSub').textContent=t.sub;
+  const byCode={}; D.members.forEach(m=>{(byCode[m.code]=byCode[m.code]||[]).push(m)});
+  Object.values(byCode).forEach(a=>a.sort((x,y)=>{const rx=ringOf(x.id),ry=ringOf(y.id); return rx!==ry?rx-ry:x.short.localeCompare(y.short)}));
+  const used=new Set(MAPG.flatMap(g=>g.codes));
+  const rest=Object.keys(byCode).filter(c=>!used.has(c)); if(rest.length) MAPG[MAPG.length-1].codes.push(...rest.filter(c=>!MAPG[MAPG.length-1].codes.includes(c)));
+  const chip=m=>`<button class="vc-chip r${ringOf(m.id)}" data-go="${esc(m.id)}" title="${esc(m.n)} · ${esc(m.city)}" style="--c:var(--seg-${esc(m.s)})"><span class="d"></span>${esc(m.short)}</button>`;
+  $('vcflow').innerHTML=`<b>${esc(t.flow)}:</b>`+MAPG.filter(g=>!g.wide).map(g=>`<span>${esc(L(g.t))}</span>`).join('<span>→</span>');
+  $('vcmap').innerHTML=MAPG.map(g=>{const segs=g.codes.filter(c=>byCode[c]); const n=segs.reduce((a,c)=>a+byCode[c].length,0); if(!n) return '';
+    return `<div class="vc-stage${g.wide?' wide':''}"><h3>${esc(L(g.t))}</h3><div class="vc-n">${n}</div>`+segs.map(c=>`<div class="vc-seg"><h4><span><code>${esc(c)}</code>${esc(segName(byCode[c][0]))}</span><span>${byCode[c].length}</span></h4><div class="vc-chips">${byCode[c].map(chip).join('')}</div></div>`).join('')+`</div>`;}).join('');
+  $('vclegend').innerHTML=[1,2,4].map((r,i)=>`<span><span class="vc-chip r${r}" style="pointer-events:none;padding:2px 6px"><span class="d"></span>${esc(t.legend[i])}</span></span>`).join('');
+  $('vcmap').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goMember(b.dataset.go));
+}
+"""
+T=T.replace("function renderAll() {",MAP_JS+"function renderAll() {",1)
+T=T.replace("function renderAll() { renderStatic(); renderStats(); renderRadar(); renderTop(); renderNews(); renderMembers(); renderCentres(); renderEvents(); renderAbout(); }","function renderAll() { renderStatic(); renderStats(); renderRadar(); renderTop(); renderNews(); renderMembers(); renderCentres(); renderEvents(); renderAbout(); renderMap(); }",1)
+assert 'renderMap();' in T and 'id="p-map"' in T and "'map','news'" in T
 html=T.replace('/*__DATA__*/',body)
 open('sx.html','w',encoding='utf-8').write(html)
 print(len(html),'companies',len(d['members']),'news',len(d['news']),'events',len(d['events']))

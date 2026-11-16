@@ -26,7 +26,7 @@ ABOUT={'cs':[
  ['What is not here','Internal cluster information, commercially sensitive company data and personal data of contact persons. The radar works with public information only. Corrections and additions: info@semicz.cz, subject “Radar Saxony”.']]}
 CS=[('Radar aktivit členů','Radar hodnotového řetězce'),('členů klastru','organizací saského ekosystému'),('v 8 segmentech hodnotového řetězce','v 10 segmentech hodnotového řetězce'),('každý bod je jeden člen s','každý bod je jedna firma s'),('jeden člen; popisek','jedna firma; popisek'),('zatím žádný člen','zatím žádná firma'),('firemní stránky členů na LinkedIn, weby členů, semicz.cz; stupeň není hodnocení člena','firemní stránky na LinkedIn, weby firem, tisk; stupeň není hodnocení firmy'),('Kmenová data z katalogu klastru a semicz.cz.','Kmenová data z veřejného adresáře členů Silicon Saxony a rešerše CNSC; zařazení čeká na potvrzení Silicon Saxony.'),('Členové','Firmy'),('členové','firmy'),('členů','firem'),('člena','firmy'),('členy','firmy'),('členech','firmách'),('člen ','firma '),('člen','firma')]
 EN=[('Member Activity Radar','Semiconductor Value Chain Radar'),('Member activity radar','Value chain radar'),('cluster members','organisations in the Saxon ecosystem'),('in 8 value-chain segments','in 10 value-chain segments'),('members’ LinkedIn company pages, member websites, semicz.cz; the level is not a rating of the member','LinkedIn company pages, company websites, press; the level is not a rating of the company'),('Master data from the cluster catalogue and semicz.cz.','Master data from the public Silicon Saxony member directory and CNSC research; segments await confirmation by Silicon Saxony.'),('Members','Companies'),('members','companies'),('Member','Company'),('member','company')]
-DE=[('Radar der Mitgliederaktivitäten','Radar der Halbleiter-Wertschöpfungskette'),('Clustermitglieder','Organisationen im sächsischen Ökosystem'),('in 8 Segmenten der Wertschöpfungskette','in 10 Segmenten der Wertschöpfungskette'),('jeder Punkt ist ein Mitglied mit','jeder Punkt ist ein Unternehmen mit'),('ein Mitglied; ','ein Unternehmen; '),('noch kein Mitglied','noch kein Unternehmen'),('Stammdaten aus dem Clusterkatalog und semicz.cz.','Stammdaten aus dem öffentlichen Mitgliederverzeichnis von Silicon Saxony und CNSC-Recherche; die Zuordnung wartet auf die Bestätigung durch Silicon Saxony.'),('LinkedIn-Unternehmensseiten der Mitglieder, Websites der Mitglieder, semicz.cz; die Stufe ist keine Bewertung des Mitglieds','LinkedIn-Unternehmensseiten, Websites der Unternehmen, Presse; die Stufe ist keine Bewertung des Unternehmens'),('Mitgliedern','Unternehmen'),('Mitglieder','Unternehmen'),('Mitglieds','Unternehmens'),('Mitglied','Unternehmen')]
+DE=[('Radar der Mitgliederaktivitäten','Radar der Halbleiter-Wertschöpfungskette'),('Clustermitglieder','Organisationen im sächsischen Ökosystem'),('in 8 Segmenten der Wertschöpfungskette','in 10 Segmenten der Wertschöpfungskette'),('jeder Punkt ist ein Mitglied mit','jeder Punkt ist ein Unternehmen mit'),('ein Mitglied; ','ein Unternehmen; '),('noch kein Mitglied','noch kein Unternehmen'),('Stammdaten aus dem Clusterkatalog und semicz.cz.','Stammdaten aus dem öffentlichen Mitgliederverzeichnis von Silicon Saxony und CNSC-Recherche; die Zuordnung wartet auf die Bestätigung durch Silicon Saxony.'),('LinkedIn-Unternehmensseiten und Websites der Mitglieder, semicz.cz; die Stufe ist keine Bewertung des Mitglieds','LinkedIn-Unternehmensseiten, YouTube-Kanäle und Websites der Unternehmen, Podcast What\'s Chippening; die Stufe ist keine Bewertung des Unternehmens'),('Mitgliedern','Unternehmen'),('Mitglieder','Unternehmen'),('Mitglieds','Unternehmens'),('Mitglied','Unternehmen')]
 def patch(a,b,pairs,lang):
     ia=next(i for i in range(a,b) if L[i].lstrip().startswith('about:['))
     ib=next(i for i in range(ia,b+1) if L[i].lstrip().startswith(']}'))
@@ -134,7 +134,7 @@ z=T.index("  labels.forEach(l => {")
 NEW_LABELS=r"""  // labels: greedy placement without overlaps (candidates around the dot; obstacles = other dots, placed labels, sector labels, canvas edge), then a repair pass
   const LH = 17;
   const _cv = document.createElement('canvas').getContext('2d'); _cv.font = '600 14px Inter, sans-serif';
-  const tw = s => { try { return Math.max(_cv.measureText(s).width, s.length * 6.5) + 4; } catch (e) { return s.length * 7.6 + 4; } };
+  const tw = s => { try { return Math.max(_cv.measureText(s).width, s.length * 6.9) + 8; } catch (e) { return s.length * 7.8 + 8; } };
   const secRects = segs.map(s => { const [a0, a1] = span[s.id]; const m = (a0 + a1) / 2, lr = R[2] + 18, x = C + lr * Math.cos(m), y = CY + lr * Math.sin(m); const anc = Math.abs(Math.cos(m)) < .25 ? 'middle' : (Math.cos(m) > 0 ? 'start' : 'end'); const yoff = Math.abs(Math.cos(m)) < .25 ? (Math.sin(m) < 0 ? -8 : 18) : 6; const w = (s.code + ' ' + L(s)).length * 9.4; const x0 = anc === 'start' ? x : anc === 'end' ? x - w : x - w / 2; return {x0, x1: x0 + w, y0: y + yoff - 17, y1: y + yoff + 5}; });
   const dotRects = dots.map(d => ({x0: d.x - 11, x1: d.x + 11, y0: d.y - 11, y1: d.y + 11, d}));
   const hit = (r, q) => !(r.x1 <= q.x0 || q.x1 <= r.x0 || r.y1 <= q.y0 || q.y1 <= r.y0);
@@ -165,14 +165,22 @@ NEW_LABELS=r"""  // labels: greedy placement without overlaps (candidates around
     }
     return {best, clash: bestScore >= 1000};
   };
-  const order = dots.slice().sort((p, q) => p.ring - q.ring || Math.hypot(p.x - C, p.y - CY) - Math.hypot(q.x - C, q.y - CY));
-  order.forEach(d => { const w = tw(d.m.short); const {best, clash} = choose(d, w, labels.map(l => l.r), false); labels.push({d, w, r: best.r, c: best.c, clash}); });
+  // dense radars: label only the most relevant dots (top items, financial results/investments, number of items, recency); the rest stay as dots with tooltip
+  const nCount = {}, nTop = {}, nFin = {};
+  D.news.forEach(n => (n.m || []).forEach(id => { nCount[id] = (nCount[id] || 0) + 1; if (n.top) nTop[id] = 1; if (n.ty === 'finance' || n.ty === 'invest') nFin[id] = 1; }));
+  const MAXL = 56;
+  const prio = d => (d.ring) * 1000 - (nTop[d.m.id] ? 300 : 0) - (nFin[d.m.id] ? 100 : 0) - Math.min(nCount[d.m.id] || 0, 5) * 20 + Math.hypot(d.x - C, d.y - CY) / 100;
+  const order = dots.slice().sort((p, q) => prio(p) - prio(q));
+  const labelSet = new Set(order.slice(0, MAXL).map(d => d.m.id));
+  const dense = order.length > MAXL;
+  order.forEach(d => { if (!labelSet.has(d.m.id)) { labels.push({d, w: 0, r: null, c: null, clash: false, nolabel: true}); return; } const w = tw(d.m.short); const placed = labels.filter(l => l.r).map(l => l.r); let {best, clash} = choose(d, w, placed, false); if (clash) ({best, clash} = choose(d, w, placed, true)); if (clash && dense) { labels.push({d, w: 0, r: null, c: null, clash: false, nolabel: true}); return; } labels.push({d, w, r: best.r, c: best.c, clash}); });
   for (let pass = 0; pass < 3; pass++) {
     let fixedAny = false;
-    labels.forEach(l => { if (!l.clash) return; const others = labels.filter(o => o !== l).map(o => o.r); const {best, clash} = choose(l.d, l.w, others, true); l.r = best.r; l.c = best.c; l.clash = clash; if (!clash) fixedAny = true; });
+    labels.forEach(l => { if (!l.clash || l.nolabel) return; const others = labels.filter(o => o !== l && o.r).map(o => o.r); const {best, clash} = choose(l.d, l.w, others, true); l.r = best.r; l.c = best.c; l.clash = clash; if (!clash) fixedAny = true; });
     if (!fixedAny) break;
   }
-  labels.forEach(l => { l.x = l.r.x; l.y = l.r.y; l.anchor = l.c.anc; l.right = l.c.anc === 'start'; l.moved = !(l.c.dy === 5 && Math.abs(l.c.dx) === 13); });
+  labels.forEach(l => { if (l.nolabel) return; l.x = l.r.x; l.y = l.r.y; l.anchor = l.c.anc; l.right = l.c.anc === 'start'; l.moved = !(l.c.dy === 5 && Math.abs(l.c.dx) === 13); });
+  const nUnl = labels.filter(l => l.nolabel).length;
 """
 T=T[:a]+NEW_LABELS+T[z:]
 OLD_LINE="""    if (Math.abs(l.y - (d.y + 5)) > 7) h += `<line x1="${d.x.toFixed(1)}" y1="${d.y.toFixed(1)}" x2="${(l.x + (l.right ? -3 : 3)).toFixed(1)}" y2="${(l.y - 4).toFixed(1)}" stroke="#5d6677" stroke-width="1"/>`;"""
@@ -181,6 +189,16 @@ T=T.replace(OLD_LINE,"""    if (l.moved) { const ex = l.anchor === 'middle' ? l.
 OLD_TXT="""text-anchor="${l.right ? 'start' : 'end'}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;"""
 assert OLD_TXT in T
 T=T.replace(OLD_TXT,"""text-anchor="${l.anchor}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;""")
+OLD_DRAW="""    if (l.moved) { const ex"""
+assert OLD_DRAW in T
+T=T.replace(OLD_DRAW,"""    if (l.nolabel) { h += `<circle cx="${d.x.toFixed(1)}" cy="${d.y.toFixed(1)}" r="7" fill="${segColor(d.s.id)}" stroke="#0d121a" stroke-width="2"/></g>`; return; }
+    if (l.moved) { const ex""",1)
+OLD_END="""  h += '</svg>';
+  $('radarSvg').innerHTML = h;"""
+assert OLD_END in T
+T=T.replace(OLD_END,"""  if (nUnl) h += `<text x="10" y="16" font-size="12" fill="#8a94a6" font-family="Inter,sans-serif">${esc(({cs:`Popisky u ${labels.length - nUnl} z ${labels.length} aktivních organizací (priorita: hlavní zprávy, finance, počet zpráv); ostatní body ukážou název po najetí myší`,en:`Labels on ${labels.length - nUnl} of ${labels.length} active organisations (priority: top items, finance, number of items); hover the other dots for the name`,de:`Beschriftung bei ${labels.length - nUnl} von ${labels.length} aktiven Organisationen (Priorität: Top-Meldungen, Finanzen, Anzahl Meldungen); die übrigen Punkte zeigen den Namen beim Überfahren`})[LANG] || '')}</text>`;
+  h += '</svg>';
+  $('radarSvg').innerHTML = h;""",1)
 # ---- search covers the map ----
 OLD_RUN="    document.querySelectorAll('nav.tabs button[data-tab]').forEach(b => badge(b.dataset.tab, words.length ? (per[b.dataset.tab] || 0) : 0));"
 assert OLD_RUN in T

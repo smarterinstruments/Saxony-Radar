@@ -69,6 +69,47 @@ IPCEI={
 }
 BO=json.load(open('data/cnsc_research_overrides.json')); OV=BO['ov']
 CONF_MAP={'high':'H','to verify':'M','uncertain':'L'}
+
+# ---- place normalisation: "City (CC)" from research city / Silicon Saxony profile city ----
+CZ_COUNTRY={'německo':'DE','rakousko':'AT','švýcarsko':'CH','francie':'FR','itálie':'IT','nizozemsko':'NL','belgie':'BE','lucembursko':'LU','dánsko':'DK','švédsko':'SE','finsko':'FI','norsko':'NO','irsko':'IE','velká británie':'GB','spojené království':'GB','usa':'US','izrael':'IL','japonsko':'JP','tchaj-wan':'TW','taiwan':'TW','jižní korea':'KR','korea':'KR','čína':'CN','singapur':'SG','polsko':'PL','česko':'CZ','slovinsko':'SI','chorvatsko':'HR','litva':'LT','lichtenštejnsko':'LI','španělsko':'ES','malajsie':'MY','germany':'DE','austria':'AT','switzerland':'CH','france':'FR','italy':'IT','netherlands':'NL','israel':'IL','japan':'JP','sweden':'SE','finland':'FI','denmark':'DK','ireland':'IE','luxembourg':'LU','slovenia':'SI','croatia':'HR','lithuania':'LT'}
+CITY_CC={'vantaa':'FI','espoo':'FI','enschede':'NL','nijmegen':'NL','eindhoven':'NL','leuven':'BE','balzers':'LI','villach':'AT','salzburg':'AT','wallern':'AT','hart bei graz':'AT','bad bleiberg':'AT','st. florian am inn':'AT','feldkirch':'AT','cupertino':'US','fremont':'US','milpitas':'US','anaheim':'US','birmingham':'US','thief river falls':'US','mansfield':'US','hillsboro':'US','singapore':'SG','getxo vizcaya':'ES','villeurbanne':'FR','toulouse':'FR','poitiers':'FR','montbonnot':'FR','lund':'SE','catania':'IT','østervrå':'DK','kaohsiung':'TW','kariya':'JP','seoul':'KR','bucheon':'KR','yongin-si':'KR','ljubljana':'SI','šibenik':'HR','zürich':'CH','bern':'CH','thun':'CH','luxembourg':'LU','vilnius':'LT','yokneam illit':'IL','warsaw':'PL','warszawa':'PL','dublin':'IE','celbridge':'IE','rožnov pod radhoštěm':'CZ','kuala lumpur':'MY','montbonnot-saint-martin':'FR','st. florian':'AT'}
+EXONYM={'drážďany':'Dresden','mnichov':'München','berlín':'Berlin','kolín':'Köln','lipsko':'Leipzig','cvikov':'Zwickau','norimberk':'Nürnberg','vídeň':'Wien','curych':'Zürich','lublaň':'Ljubljana','frankfurt nad mohanem':'Frankfurt am Main','halle (saale)':'Halle/Saale'}
+def place(research_city,ss_city,fallback_cc='DE'):
+    """Return (label, cc). Research city wins; Czech exonyms and country words are normalised; '(pobočka Drážďany)' and similar notes are dropped."""
+    raw=(research_city or '').strip()
+    if raw and re.search(r"http|www\.",raw): raw=''
+    if not raw:
+        raw=re.sub(r"[^A-Za-zÄÖÜäöüß .\-()]","",ss_city or '').strip()
+        if re.search(r"http|www\.|\.(de|com|org|net|eu|at|ch)\b",raw) or raw.lower()=='sasko': raw=''
+    cc=None; city=raw
+    # country after comma or in parentheses
+    m=re.search(r",\s*([^,()]+)$",city)
+    if m and m.group(1).strip().lower() in CZ_COUNTRY: cc=CZ_COUNTRY[m.group(1).strip().lower()]; city=city[:m.start()].strip()
+    for pm in re.finditer(r"\(([^)]*)\)",city):
+        inner=pm.group(1).strip().lower()
+        if inner in CZ_COUNTRY: cc=CZ_COUNTRY[inner]
+        elif re.fullmatch(r"[a-z]{2}",inner) and inner.upper() in ('DE','AT','CH','FR','IT','NL','BE','LU','DK','SE','FI','NO','IE','GB','US','IL','JP','TW','KR','CN','SG','PL','CZ','SI','HR','LT','LI','ES','MY'): cc=inner.upper()
+        elif inner=='ct': cc='IT'  # Italian province code (Catania)
+    # drop explanatory parentheses, keep geographic ones (Saale, Oder, Taunus, Siegerland)
+    city=re.sub(r"\s*\((?!saale|oder|taunus|siegerland|durynsko|sasko)[^)]*\)","",city,flags=re.I).strip()
+    city=re.sub(r"\s*\((durynsko|sasko)\)","",city,flags=re.I).strip()
+    if '/' in city:
+        parts=[x.strip() for x in city.split('/') if x.strip()]
+        pick=parts[0]
+        if any(parts[0].lower()==k or parts[0].lower().startswith(k+' ') for k in CITY_CC):
+            for x in parts[1:]:
+                xl=EXONYM.get(x.lower(),x).lower()
+                if not any(xl==k or xl.startswith(k+' ') for k in CITY_CC): pick=x; cc=cc or 'DE'; break
+        city=pick
+    city=city.split(',')[0].strip()
+    city=re.sub(r"\s*\((saale|oder|taunus|siegerland)\)",lambda mm:'/'+mm.group(1).capitalize(),city,flags=re.I)
+    low=city.lower()
+    if low in EXONYM: city=EXONYM[low]
+    if not cc:
+        for k,v in CITY_CC.items():
+            if low==k or low.startswith(k+' '): cc=v; break
+    if not cc: cc=fallback_cc
+    return ((f"{city} ({cc})" if city else cc), cc)
 # DE/EN translations of the Czech research profiles (id -> {de:{p,s}, en:{p,s}}); Czech is the fallback
 TRF='data/profiles_translations_de_en.json'
 TR=json.load(open(TRF)) if os.path.exists(TRF) else {}
@@ -115,8 +156,8 @@ for o in rows:
         if o2['code'] and o2['code'] in CODE: code=o2['code']; cs_n,en_n,sec=CODE[code]
         if o2['conf'] in CONF_MAP: o=dict(o); o['conf']=o2['conf']
         conf={'H':('zařazení ověřeno CNSC','verified by CNSC','von CNSC geprüft'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get(CONF_MAP.get(o2['conf'],(o.get('conf') or 'M')[:1].upper()),conf)
-    members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":((o2 and o2.get('city') and not re.search(r"http|www\.",o2['city']) and re.sub(r"\s*/\s*.*$","",o2['city']).split(",")[0].strip()) or (lambda c: '' if re.search(r"http|www\.|\.(de|com|org|net|eu|at|ch)\b",c) else c)(re.sub(r"[^A-Za-zÄÖÜäöüß .\-]","",o.get('city') or '').strip()) or 'Sasko')+" (DE)","url":url((o2 and o2.get('web')) or o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":card(code,cs_n,o2,'Produkty a služby'),"en":card(code,en_n,tro(i,o2,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,o2,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}.get(CONF_MAP.get((o2 or {}).get('conf',''),(o.get('conf') or 'M')[:1].upper()),'to verify'),"logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
+    members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":place((o2 or {}).get('city'),o.get('city'))[0],"cc":place((o2 or {}).get('city'),o.get('city'))[1],"url":url((o2 and o2.get('web')) or o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
+        "cs":card(code,cs_n,o2,'Produkty a služby'),"en":card(code,en_n,tro(i,o2,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,o2,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}.get(CONF_MAP.get((o2 or {}).get('conf',''),(o.get('conf') or 'M')[:1].upper()),'to verify'),"logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"ver":1 if o.get('conf')=='H' else 0,"code":code})
 
 # ---- organisations from CNSC research that are not Silicon Saxony members ----
 CODE_FIX={'3.3':'3.2','4.1':'1.3'}
@@ -132,12 +173,12 @@ for e in BO['extra']:
     ids.add(i); byname[nm]=i; byname[nm.strip().lower()]=i
     confk={'high':'H','to verify':'M','uncertain':'L'}.get(e.get('conf',''),'M')
     conf={'H':('zařazení ověřeno CNSC','verified by CNSC','von CNSC geprüft'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}[confk]
-    city=(re.sub(r"\s*/\s*.*$","",e.get('city') or '').split(',')[0].strip() if not re.search(r'http|www\.',e.get('city') or '') else '') or ('Dresden' if 'Dresden' in e['name'] else 'Sasko')
+    city,ccx=place(e.get('city'),'Dresden' if 'Dresden' in e['name'] else '')
     prof=e.get('profile','') ; prod=e.get('products','')
     yt=''; li=''
-    members.append({"id":i,"n":e['name'],"short":short(nm),"city":city+" (DE)","url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
+    members.append({"id":i,"n":e['name'],"short":short(nm),"city":city,"cc":ccx,"url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
         "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,tro(i,e,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,e,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
-        "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"cc":"DE","ver":1 if confk=='H' else 0,"code":code})
+        "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"ver":1 if confk=='H' else 0,"code":code})
 def M(prefix):
     for n,i in byname.items():
         if n.startswith(prefix): return i
@@ -234,10 +275,10 @@ meta.update({"edition":"W46/2026","updated":"2026-11-16",
  "lede":{"cs":"Co firmy saského polovodičového ekosystému každý týden zveřejní, od návrhu čipů přes zařízení, subsystémy a materiály po výrobu, výzkum a distribuci. Seznam firem vychází z veřejného adresáře členů Silicon Saxony a z rešerše CNSC ve veřejných zdrojích; zařazení do segmentů taxonomie CNSC je pracovní a čeká na potvrzení Silicon Saxony.",
   "en":"What companies in the Saxon semiconductor ecosystem publish each week, from chip design through equipment, subsystems and materials to fabrication, research and distribution. The company list comes from the public Silicon Saxony member directory and CNSC research in public sources; the CNSC taxonomy segments are provisional and await confirmation by Silicon Saxony.",
   "de":"Was Unternehmen des sächsischen Halbleiter-Ökosystems jede Woche veröffentlichen, vom Chipdesign über Anlagen, Subsysteme und Materialien bis zu Fertigung, Forschung und Distribution. Die Unternehmensliste stammt aus dem öffentlichen Mitgliederverzeichnis von Silicon Saxony und aus CNSC-Recherchen in öffentlichen Quellen; die Zuordnung zu den Segmenten der CNSC-Taxonomie ist vorläufig und wartet auf die Bestätigung durch Silicon Saxony."},
- "banner":{"cs":f"Náhled pro Silicon Saxony, edice W46/2026 (15. 11. 2026). {len(members)} organizací, z toho {sum(1 for m in members if m.get('ssm'))} členů Silicon Saxony a {sum(1 for m in members if not m.get('ssm'))} nečlenů z rešerše CNSC. Aktivity ({len(N)} záznamů) zatím jen z LinkedIn stránek a YouTube kanálů {len(set(x for n in N for x in n['m']))} vybraných firem a institucí, sběr 15.–16. 11. 2026; u ostatních firem sběr teprve začíná. Neveřejná pracovní verze.",
-  "en":f"Preview for Silicon Saxony, edition W46/2026 (15 Nov 2026). {len(members)} organisations, {sum(1 for m in members if m.get('ssm'))} Silicon Saxony members and {sum(1 for m in members if not m.get('ssm'))} non-members from CNSC research. Activities ({len(N)} entries) so far only from the LinkedIn pages and YouTube channels of {len(set(x for n in N for x in n['m']))} selected companies and institutes, collected 15–16 Nov 2026; collection for the other companies is only starting. Non-public working version.",
-  "de":f"Vorschau für Silicon Saxony, Ausgabe W46/2026 (15. 11. 2026). {len(members)} Organisationen, davon {sum(1 for m in members if m.get('ssm'))} Mitglieder von Silicon Saxony und {sum(1 for m in members if not m.get('ssm'))} Nichtmitglieder aus CNSC-Recherche. Aktivitäten ({len(N)} Einträge) bisher nur von den LinkedIn-Seiten und YouTube-Kanälen von {len(set(x for n in N for x in n['m']))} ausgewählten Unternehmen und Instituten, erfasst am 15.–16. 11. 2026; für die übrigen Unternehmen beginnt die Erfassung erst. Nicht öffentliche Arbeitsversion."}})
-src=[["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–15. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"],["IPCEI-Beteiligung: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023) / tisková zpráva Svobodného státu Sasko","https://www.medienservice.sachsen.de/medien/news/1069594"],["IPCEI-Beteiligung: Europäische Kommission, IPCEI Mikroelektronik (IP/18/6862) und IPCEI ME/CT (IP/23/3087); BMWK-Erläuterungspapier","https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087"]]
+ "banner":{"cs":f"Náhled pro Silicon Saxony, edice W46/2026 (16. 11. 2026). {len(members)} organizací, z toho {sum(1 for m in members if m.get('ssm'))} členů Silicon Saxony a {sum(1 for m in members if not m.get('ssm'))} nečlenů z rešerše CNSC. Aktivity ({len(N)} záznamů) zatím jen z LinkedIn stránek a YouTube kanálů {len(set(x for n in N for x in n['m']))} vybraných firem a institucí, sběr 15.–16. 11. 2026; u ostatních firem sběr teprve začíná. Neveřejná pracovní verze.",
+  "en":f"Preview for Silicon Saxony, edition W46/2026 (16 Nov 2026). {len(members)} organisations, {sum(1 for m in members if m.get('ssm'))} Silicon Saxony members and {sum(1 for m in members if not m.get('ssm'))} non-members from CNSC research. Activities ({len(N)} entries) so far only from the LinkedIn pages and YouTube channels of {len(set(x for n in N for x in n['m']))} selected companies and institutes, collected 15–16 Nov 2026; collection for the other companies is only starting. Non-public working version.",
+  "de":f"Vorschau für Silicon Saxony, Ausgabe W46/2026 (16. 11. 2026). {len(members)} Organisationen, davon {sum(1 for m in members if m.get('ssm'))} Mitglieder von Silicon Saxony und {sum(1 for m in members if not m.get('ssm'))} Nichtmitglieder aus CNSC-Recherche. Aktivitäten ({len(N)} Einträge) bisher nur von den LinkedIn-Seiten und YouTube-Kanälen von {len(set(x for n in N for x in n['m']))} ausgewählten Unternehmen und Instituten, erfasst am 15.–16. 11. 2026; für die übrigen Unternehmen beginnt die Erfassung erst. Nicht öffentliche Arbeitsversion."}})
+src=[["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–16. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"],["IPCEI-Beteiligung: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023) / tisková zpráva Svobodného státu Sasko","https://www.medienservice.sachsen.de/medien/news/1069594"],["IPCEI-Beteiligung: Europäische Kommission, IPCEI Mikroelektronik (IP/18/6862) und IPCEI ME/CT (IP/23/3087); BMWK-Erläuterungspapier","https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087"]]
 TYPES=[dict(t) for t in pilot['types']]+[{"id":"media","cs":"Podcast / video","en":"Podcast / video","de":"Podcast / Video"}]
 SRCK=[dict(x) for x in pilot['sourcesKinds']]+[{"id":"youtube","cs":"YouTube kanál firmy","en":"Company YouTube channel","de":"YouTube-Kanal des Unternehmens"},{"id":"chippening","cs":"Podcast What's Chippening (Silicon Saxony)","en":"What's Chippening podcast (Silicon Saxony)","de":"Podcast What's Chippening (Silicon Saxony)"}]
 for x in SRCK: x.setdefault("de",{"linkedin":"LinkedIn-Unternehmensseite","web":"Unternehmenswebsite","press":"Presse / Medien","member":"vom Unternehmen gemeldet","cnsc":"CNSC-Kanäle"}.get(x["id"],x["en"]))

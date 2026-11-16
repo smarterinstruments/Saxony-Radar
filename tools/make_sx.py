@@ -67,6 +67,8 @@ IPCEI={
  'ZEISS':[('ME/CT',2023,'Oberkochen',EC_MECT),('ME',2018,'Oberkochen',EC_ME)],
  'Rohde & Schwarz GmbH':[('ME/CT',2023,'München',EC_MECT)],
 }
+BO=json.load(open('data/cnsc_research_overrides.json')); OV=BO['ov']
+CONF_MAP={'high':'H','to verify':'M','uncertain':'L'}
 members=[]; ids=set(); byname={}
 rows=list(ins)+[{'name':'Silicon Saxony e.V.','city':'Dresden','web':'https://silicon-saxony.de','tags':'Cluster|Netzwerk|Standortmarketing','code':'7.3','conf':'H','chip':False,'desc':''}]
 for o in rows:
@@ -92,8 +94,13 @@ for o in rows:
     kw_de=(' Stichworte aus dem Silicon-Saxony-Profil: '+', '.join(ks)+'.') if ks else ''
     chip='';chip_en=''
     conf={'H':('zařazení s vysokou jistotou','high-confidence segment','Zuordnung mit hoher Sicherheit'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get((o.get('conf') or 'M')[:1].upper(),('zařazení ověřit','segment to verify','Zuordnung zu prüfen'))
-    members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":(re.sub(r"[^A-Za-zÄÖÜäöüß .\-/]","",o.get('city') or '').strip() or 'Sasko')+" (DE)","url":url(o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":f"{code} {cs_n} ({conf[0]}).{kw_cs}{chip}","en":f"{code} {en_n} ({conf[1]}).{kw_en}{chip_en}","de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}).{kw_de}","logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
+    o2=OV.get(i)
+    if o2:
+        if o2['code'] and o2['code'] in CODE: code=o2['code']; cs_n,en_n,sec=CODE[code]
+        if o2['conf'] in CONF_MAP: o=dict(o); o['conf']=o2['conf']
+        conf={'H':('zařazení ověřeno CNSC','verified by CNSC','von CNSC geprüft'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get(CONF_MAP.get(o2['conf'],(o.get('conf') or 'M')[:1].upper()),conf)
+    members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":((o2 and o2.get('city') and re.sub(r"\s*/\s*.*$","",o2['city']).split(",")[0].strip()) or re.sub(r"[^A-Za-zÄÖÜäöüß .\-/]","",o.get('city') or '').strip() or 'Sasko')+" (DE)","url":url((o2 and o2.get('web')) or o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
+        "cs":(f"{code} {cs_n} ({conf[0]}). {o2['profile']}" + (f" Produkty a služby: {o2['products']}" if o2.get('products') else '')) if (o2 and o2.get('profile')) else f"{code} {cs_n} ({conf[0]}).{kw_cs}{chip}","en":f"{code} {en_n} ({conf[1]}).{kw_en}{chip_en}","de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}).{kw_de}","logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
 def M(prefix):
     for n,i in byname.items():
         if n.startswith(prefix): return i

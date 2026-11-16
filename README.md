@@ -4,6 +4,7 @@
 
 **Semiconductor Value Chain Radar – Saxony.** Weekly radar of public activities of companies and institutes in the Saxon semiconductor ecosystem, prepared by the Czech National Semiconductor Cluster (CNSC) for Silicon Saxony under the memorandum of understanding of 12 Nov 2026.
 
+- Live (GitHub Pages): https://smarterinstruments.github.io/Saxony-Radar/
 - Seite / page: `index.html` (Sprachen: DE, EN, CZ)
 - Daten / data: `data/radar_sx.json`; Tabelle / spreadsheet: `data/Saxony_Radar_final_W46_2026-11-16.xlsx`; Übersetzungen der Kurzprofile / profile translations: `data/profiles_translations_de_en.json`
 - Reiter „Wertschöpfungskette“ / tab “Value chain map”: alle Organisationen in einem Bild, Klick öffnet die Karte / all organisations in one picture, click opens the card

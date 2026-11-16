@@ -1,4 +1,4 @@
-import json, re, unicodedata, collections
+import json, os, re, unicodedata, collections
 pilot=json.load(open('data/radar.json'))
 fin=json.load(open('/home/claude/sx/final.json'))
 ins=fin['ins'] if isinstance(fin,dict) else fin
@@ -69,6 +69,15 @@ IPCEI={
 }
 BO=json.load(open('data/cnsc_research_overrides.json')); OV=BO['ov']
 CONF_MAP={'high':'H','to verify':'M','uncertain':'L'}
+# DE/EN translations of the Czech research profiles (id -> {de:{p,s}, en:{p,s}}); Czech is the fallback
+TRF='data/profiles_translations_de_en.json'
+TR=json.load(open(TRF)) if os.path.exists(TRF) else {}
+def tro(i,o2,lang):
+    """profile/products dict for a language: translated when available, else the Czech original"""
+    if not o2: return o2
+    t=TR.get(i,{}).get(lang)
+    if not t: return o2
+    return {'profile':t.get('p') or o2.get('profile',''),'products':t.get('s') or o2.get('products','')}
 def card(code,name,o2,label):
     t=f"{code} {name}."
     if o2 and o2.get('profile'):
@@ -107,7 +116,7 @@ for o in rows:
         if o2['conf'] in CONF_MAP: o=dict(o); o['conf']=o2['conf']
         conf={'H':('zařazení ověřeno CNSC','verified by CNSC','von CNSC geprüft'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get(CONF_MAP.get(o2['conf'],(o.get('conf') or 'M')[:1].upper()),conf)
     members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":((o2 and o2.get('city') and not re.search(r"http|www\.",o2['city']) and re.sub(r"\s*/\s*.*$","",o2['city']).split(",")[0].strip()) or (lambda c: '' if re.search(r"http|www\.|\.(de|com|org|net|eu|at|ch)\b",c) else c)(re.sub(r"[^A-Za-zÄÖÜäöüß .\-]","",o.get('city') or '').strip()) or 'Sasko')+" (DE)","url":url((o2 and o2.get('web')) or o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":card(code,cs_n,o2,'Produkty a služby'),"en":card(code,en_n,o2,'Products and services'),"de":card(code,DE_CODE.get(code,en_n),o2,'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}.get(CONF_MAP.get((o2 or {}).get('conf',''),(o.get('conf') or 'M')[:1].upper()),'to verify'),"logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
+        "cs":card(code,cs_n,o2,'Produkty a služby'),"en":card(code,en_n,tro(i,o2,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,o2,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}.get(CONF_MAP.get((o2 or {}).get('conf',''),(o.get('conf') or 'M')[:1].upper()),'to verify'),"logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
 
 # ---- organisations from CNSC research that are not Silicon Saxony members ----
 CODE_FIX={'3.3':'3.2','4.1':'1.3'}
@@ -127,7 +136,7 @@ for e in BO['extra']:
     prof=e.get('profile','') ; prod=e.get('products','')
     yt=''; li=''
     members.append({"id":i,"n":e['name'],"short":short(nm),"city":city+" (DE)","url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,e,'Products and services'),"de":card(code,DE_CODE.get(code,en_n),e,'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
+        "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,tro(i,e,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,e,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
         "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"cc":"DE","ver":1 if confk=='H' else 0,"code":code})
 def M(prefix):
     for n,i in byname.items():

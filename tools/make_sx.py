@@ -44,6 +44,29 @@ def tags(t):
     return ks[:6]
 LI={'Silicon Saxony':'silicon-saxony','GlobalFoundries Dresden':'globalfoundries','Robert Bosch Semiconductor Manufac':'bosch-semiconductors-and-sensors','X-FAB Semiconductor':'x-fab','European Semiconductor Manufacturi':'esmc-dresden','HEIMANN Sensor':'heimannsensor','Siltronic AG':'siltronic-ag','Novaled':'novaled','3D-Micromac':'3d-micromac-ag','VON ARDENNE':'von-ardenne','Freiberg Instruments':'freiberg-instruments-gmbh','Fabmatics':'fabmatics-gmbh','SEMPA':'sempa-systems','DAS Environmental':'das-environmental-experts','Kontron AIS':'kontronaisgmbh','Ferroelectric Memory':'ferroelectric-memory-company','FaradaIC':'faradaic-sensors-gmbh','Last Mile Semiconductor':'lm-semi','Fraunhofer-Institut für Photonisch':'fraunhofer-ipms','Fraunhofer-Institut für Elektronis':'fraunhofer-enas','Fraunhofer-Institut für Keramische':'fraunhoferikts','NaMLab':'namlab-gmbh','Barkhausen Institut':'barkhausen-institut','Infineon Technologies Dresden':'infineon-technologies','3-5 Power Electronics':'3-5-power-electronics-gmbh','ALLOS Semiconductors':'allos-semiconductors','Freiberger Compound Materials':'freiberger-compound-materials-gmbh','Photronics MZD':'photronics-mzd-gmbh','ALLRESIST':'allresist-gmbh','HQ-Dielectrics':'hq-dielectrics-gmbh','DREEBIT':'dreebit-gmbh','Racyics':'racyics','SAW COMPONENTS':'saw-components-dresden-gmbh','Advanced Mask Technology Center':'advanced-mask-technology-center'}
 YT={'Silicon Saxony':'UCeYgs8OL1iLuEAA8nTt83kA','Infineon Technologies Dresden':'UCoTflChMPX0VBFXvXYmcu9w','GlobalFoundries Dresden':'UCzTp5bq9Oylz1QPOw3DFT3g','HEIMANN Sensor':'UCnEuDKDci1G8giQ3pXcTz9w','X-FAB Semiconductor':'UCZVqNluNp8W0Ni9CQ0PTvyQ','Siltronic AG':'UCLaAar8l5kh3ten-Ag1NmSw','Photronics MZD':'UCrvDiBLvJdJvI_SXHCMK79g','Novaled':'UCJWoougdyBG0Fhyx6G6WgUQ','3D-Micromac':'UCI-HLfaix5_l9LYwSWzinJQ','VON ARDENNE':'UC_1vCMlqcrB0VnND6ZhnLsA','Freiberg Instruments':'UC4mz6Hb91CCTTHW278WQD3g','DREEBIT':'UCX1vv8U7YwiDXnDQvlUzQ2Q','HQ-Dielectrics':'UCQLZeFR96KUlVG4DVPdF0zA','Fabmatics':'UC_lEqVo7uY_DSz_Mo_JJz4A','DAS Environmental':'UC3brnNte3BrCgBUCjUy3Caw','Kontron AIS':'UCFPhhlovG57eiXnoEkHNgpA','SEMPA':'UCE0aQdSf-tcJM5jNDFxMq4A','Ferroelectric Memory':'UCwS8QbcXSicNi7UaMwIrBzg','Fraunhofer-Institut für Elektronis':'UCSx8JH3Z-MMPFXoIB2AG8Sw','Fraunhofer-Institut für Photonisch':'UCQIIfGII-_2Xo31XCaBTVEQ','Fraunhofer-Institut für Keramische':'UCuqD8nyRSBEIyH8G4svs6fg','NaMLab':'UCWwLt9Kz-wFJ4BkTfJMY_Fw'}
+
+# IPCEI participation (public sources: Freistaat Sachsen press release 2023, BMWK, European Commission)
+SX_MECT='https://www.medienservice.sachsen.de/medien/news/1069594'
+EC_MECT='https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087'
+EC_ME='https://ec.europa.eu/commission/presscorner/detail/en/IP_18_6862'
+BMWK_ME='https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Downloads/M-O/staerkung-mikroelektronik-standort-deutschland-europa-erlaeuterungspapier.pdf'
+IPCEI={
+ 'GlobalFoundries Dresden':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'Infineon Technologies Dresden':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'Robert Bosch Semiconductor':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'Bosch Sensortec':[('ME/CT',2023,'Dresden',SX_MECT)],
+ 'Ferroelectric Memory':[('ME/CT',2023,'Dresden',SX_MECT)],
+ 'Freiberger Compound Materials':[('ME/CT',2023,'Freiberg',SX_MECT)],
+ 'NXP Semiconductors Germany':[('ME/CT',2023,'Dresden',SX_MECT)],
+ 'Racyics':[('ME',2018,'Dresden',EC_ME)],
+ 'Advanced Mask Technology Center':[('ME',2018,'Dresden (assoziiert)',EC_ME)],
+ '3D-Micromac':[('ME',2018,'Chemnitz (assoziiert)',EC_ME)],
+ 'X-FAB Semiconductor':[('ME/CT',2023,'Erfurt, Itzehoe',EC_MECT),('ME',2018,'Erfurt, Itzehoe',EC_ME)],
+ 'Applied Materials':[('ME/CT',2023,'Feldkirchen (assoziiert)',EC_MECT)],
+ 'mi2-factory':[('ME/CT',2023,'Jena',EC_MECT)],
+ 'ZEISS':[('ME/CT',2023,'Oberkochen',EC_MECT),('ME',2018,'Oberkochen',EC_ME)],
+ 'Rohde & Schwarz GmbH':[('ME/CT',2023,'München',EC_MECT)],
+}
 members=[]; ids=set(); byname={}
 rows=list(ins)+[{'name':'Silicon Saxony e.V.','city':'Dresden','web':'https://silicon-saxony.de','tags':'Cluster|Netzwerk|Standortmarketing','code':'7.3','conf':'H','chip':False,'desc':''}]
 for o in rows:
@@ -60,6 +83,9 @@ for o in rows:
     yt=''
     for k,v in YT.items():
         if o['name'].startswith(k): yt=v
+    ipc=[]
+    for k,v in IPCEI.items():
+        if o['name'].startswith(k): ipc=[{"p":p,"y":y,"s":site,"u":u} for p,y,site,u in v]
     ks=tags(o.get('tags',''))
     kw_cs=(' Klíčová slova z profilu Silicon Saxony: '+', '.join(ks)+'.') if ks else ''
     kw_en=(' Silicon Saxony profile keywords: '+', '.join(ks)+'.') if ks else ''
@@ -67,7 +93,7 @@ for o in rows:
     chip='';chip_en=''
     conf={'H':('zařazení s vysokou jistotou','high-confidence segment','Zuordnung mit hoher Sicherheit'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get((o.get('conf') or 'M')[:1].upper(),('zařazení ověřit','segment to verify','Zuordnung zu prüfen'))
     members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":(re.sub(r"[^A-Za-zÄÖÜäöüß .\-/]","",o.get('city') or '').strip() or 'Sasko')+" (DE)","url":url(o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":f"{code} {cs_n} ({conf[0]}).{kw_cs}{chip}","en":f"{code} {en_n} ({conf[1]}).{kw_en}{chip_en}","de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}).{kw_de}","logo":"","li":li,"yt":yt,"note":"","liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
+        "cs":f"{code} {cs_n} ({conf[0]}).{kw_cs}{chip}","en":f"{code} {en_n} ({conf[1]}).{kw_en}{chip_en}","de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}).{kw_de}","logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
 def M(prefix):
     for n,i in byname.items():
         if n.startswith(prefix): return i
@@ -167,7 +193,7 @@ meta.update({"edition":"W46/2026","updated":"2026-11-15",
  "banner":{"cs":f"Náhled pro Silicon Saxony, edice W46/2026 (15. 11. 2026). {len(members)} organizací. Aktivity ({len(N)} záznamů) zatím jen z LinkedIn stránek a YouTube kanálů {len(set(x for n in N for x in n['m']))} vybraných firem a institucí, sběr 15.–16. 11. 2026; u ostatních firem sběr teprve začíná. Neveřejná pracovní verze.",
   "en":f"Preview for Silicon Saxony, edition W46/2026 (15 Nov 2026). {len(members)} organisations. Activities ({len(N)} entries) so far only from the LinkedIn pages and YouTube channels of {len(set(x for n in N for x in n['m']))} selected companies and institutes, collected 15–16 Nov 2026; collection for the other companies is only starting. Non-public working version.",
   "de":f"Vorschau für Silicon Saxony, Ausgabe W46/2026 (15. 11. 2026). {len(members)} Organisationen. Aktivitäten ({len(N)} Einträge) bisher nur von den LinkedIn-Seiten und YouTube-Kanälen von {len(set(x for n in N for x in n['m']))} ausgewählten Unternehmen und Instituten, erfasst am 15.–16. 11. 2026; für die übrigen Unternehmen beginnt die Erfassung erst. Nicht öffentliche Arbeitsversion."}})
-src=[["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–15. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"]]
+src=[["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–15. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"],["IPCEI-Beteiligung: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023) / tisková zpráva Svobodného státu Sasko","https://www.medienservice.sachsen.de/medien/news/1069594"],["IPCEI-Beteiligung: Europäische Kommission, IPCEI Mikroelektronik (IP/18/6862) und IPCEI ME/CT (IP/23/3087); BMWK-Erläuterungspapier","https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087"]]
 TYPES=[dict(t) for t in pilot['types']]+[{"id":"media","cs":"Podcast / video","en":"Podcast / video","de":"Podcast / Video"}]
 SRCK=[dict(x) for x in pilot['sourcesKinds']]+[{"id":"youtube","cs":"YouTube kanál firmy","en":"Company YouTube channel","de":"YouTube-Kanal des Unternehmens"},{"id":"chippening","cs":"Podcast What's Chippening (Silicon Saxony)","en":"What's Chippening podcast (Silicon Saxony)","de":"Podcast What's Chippening (Silicon Saxony)"}]
 for x in SRCK: x.setdefault("de",{"linkedin":"LinkedIn-Unternehmensseite","web":"Unternehmenswebsite","press":"Presse / Medien","member":"vom Unternehmen gemeldet","cnsc":"CNSC-Kanäle"}.get(x["id"],x["en"]))

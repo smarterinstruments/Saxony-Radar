@@ -99,6 +99,11 @@ body=('{\n'+'\n'.join(parts)+'\n}').replace('</','<\\/')
 for a,c in [("L({cs: n.cs, en: n.en})","L({cs:n.cs,en:n.en,de:n.de})"),("L({cs:m.cs,en:m.en})","L({cs:m.cs,en:m.en,de:m.de})"),("L({cs:e.cs, en:e.en})","L({cs:e.cs,en:e.en,de:e.de})"),("L({cs:n.cs,en:n.en})","L({cs:n.cs,en:n.en,de:n.de})")]:
     assert a in T, a
     T=T.replace(a,c)
+# ---- IPCEI badges on member cards ----
+OLD_P="`<p>${esc(L({cs:m.cs,en:m.en,de:m.de}))}</p>`"
+assert OLD_P in T
+T=T.replace(OLD_P,"`<p>${esc(L({cs:m.cs,en:m.en,de:m.de}))}</p>` + ((m.ipcei||[]).length ? `<div class=\"ipc\">${m.ipcei.map(x=>`<a class=\"chip ipc\" href=\"${esc(x.u)}\" target=\"_blank\" rel=\"noopener\" title=\"${esc(x.s)}\">IPCEI ${esc(x.p)} ${x.y}${x.s&&/assoz/i.test(x.s)?' · '+({cs:'přidružený',en:'associate',de:'assoziiert'})[LANG]:''} ↗</a>`).join('')}</div>` : '')",1)
+T=T.replace("</style>",".ipc{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 4px}.chip.ipc{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);font-weight:600}.chip.ipc:hover{text-decoration:underline}\n</style>",1)
 # ---- clickable organisation names in the overview level boxes ----
 OLD_WHO="const who = D.members.filter(m => ringOf(m.id) === r.n).map(m => m.short);"
 assert OLD_WHO in T
@@ -137,6 +142,7 @@ MAP_CSS=""".vcmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(240p
 .vc-chip.r2{box-shadow:inset 0 0 0 1px var(--ring2)}
 .vc-chip .d{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--ring4)}
 .vc-chip.r1 .d{background:var(--ring1)}.vc-chip.r2 .d{background:var(--ring2)}
+.vc-chip .ipcm{font:600 9px/1 inherit;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:1px 3px;margin-left:4px;vertical-align:1px}
 .vc-flow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 12px;color:var(--muted);font-size:12px}
 .vc-flow b{color:inherit;font-weight:600}
 .vc-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:12px 0 0}
@@ -154,9 +160,9 @@ MAP_HTML="""  <section class="panel" id="p-map" role="tabpanel">
 """
 T=T.replace('  <section class="panel" id="p-news" role="tabpanel">',MAP_HTML+'  <section class="panel" id="p-news" role="tabpanel">',1)
 MAP_JS=r"""
-const MAPT={cs:{h:'Mapa hodnotového řetězce',sub:'Všechny organizace na jednom obrázku, uspořádané podle taxonomie CNSC: sloupce jsou fáze řetězce, boxy segmenty, štítky jednotlivé firmy a instituce. Kliknutím na štítek otevřete kartu organizace. Tečka ukazuje čerstvost poslední veřejné aktivity (tmavá: tento týden, střední: tento měsíc, světlá: starší nebo zatím nesledováno).',legend:['tento týden','tento měsíc','starší nebo zatím nesledováno'],flow:'Tok hodnotového řetězce'},
- en:{h:'Value chain map',sub:'All organisations in one picture, arranged by the CNSC taxonomy: columns are stages of the chain, boxes are segments, chips are individual companies and institutes. Click a chip to open the organisation card. The dot shows the freshness of the last public activity (dark: this week, medium: this month, light: older or not yet tracked).',legend:['this week','this month','older or not yet tracked'],flow:'Value chain flow'},
- de:{h:'Wertschöpfungskette',sub:'Alle Organisationen in einem Bild, geordnet nach der CNSC-Taxonomie: Spalten sind Stufen der Kette, Kästen die Segmente, Chips die einzelnen Unternehmen und Institute. Klick auf einen Chip öffnet die Organisationskarte. Der Punkt zeigt die Aktualität der letzten öffentlichen Aktivität (dunkel: diese Woche, mittel: diesen Monat, hell: älter oder noch nicht erfasst).',legend:['diese Woche','diesen Monat','älter oder noch nicht erfasst'],flow:'Fluss der Wertschöpfungskette'}};
+const MAPT={cs:{h:'Mapa hodnotového řetězce',sub:'Všechny organizace na jednom obrázku, uspořádané podle taxonomie CNSC: sloupce jsou fáze řetězce, boxy segmenty, štítky jednotlivé firmy a instituce. Kliknutím na štítek otevřete kartu organizace. Tečka ukazuje čerstvost poslední veřejné aktivity (tmavá: tento týden, střední: tento měsíc, světlá: starší nebo zatím nesledováno).',legend:['tento týden','tento měsíc','starší nebo zatím nesledováno'],flow:'Tok hodnotového řetězce',ipc:'IPCEI = účastník IPCEI Mikroelektronika (2018) nebo IPCEI ME/CT (2023) podle veřejných zdrojů; podrobnosti na kartě'},
+ en:{h:'Value chain map',sub:'All organisations in one picture, arranged by the CNSC taxonomy: columns are stages of the chain, boxes are segments, chips are individual companies and institutes. Click a chip to open the organisation card. The dot shows the freshness of the last public activity (dark: this week, medium: this month, light: older or not yet tracked).',legend:['this week','this month','older or not yet tracked'],flow:'Value chain flow',ipc:'IPCEI = participant in IPCEI Microelectronics (2018) or IPCEI ME/CT (2023) according to public sources; details on the card'},
+ de:{h:'Wertschöpfungskette',sub:'Alle Organisationen in einem Bild, geordnet nach der CNSC-Taxonomie: Spalten sind Stufen der Kette, Kästen die Segmente, Chips die einzelnen Unternehmen und Institute. Klick auf einen Chip öffnet die Organisationskarte. Der Punkt zeigt die Aktualität der letzten öffentlichen Aktivität (dunkel: diese Woche, mittel: diesen Monat, hell: älter oder noch nicht erfasst).',legend:['diese Woche','diesen Monat','älter oder noch nicht erfasst'],flow:'Fluss der Wertschöpfungskette',ipc:'IPCEI = Teilnehmer am IPCEI Mikroelektronik (2018) oder IPCEI ME/KT (2023) laut öffentlichen Quellen; Details auf der Karte'}};
 const MAPG=[
  {id:'design',codes:['1.1','1.2','1.3','1.4'],t:{cs:'1 Návrh a software',en:'1 Design & software',de:'1 Design & Software'}},
  {id:'equip',codes:['2.1','2.2','2.3'],t:{cs:'2 Zařízení a metrologie',en:'2 Equipment & metrology',de:'2 Anlagen & Messtechnik'}},
@@ -174,11 +180,11 @@ function renderMap(){
   Object.values(byCode).forEach(a=>a.sort((x,y)=>{const rx=ringOf(x.id),ry=ringOf(y.id); return rx!==ry?rx-ry:x.short.localeCompare(y.short)}));
   const used=new Set(MAPG.flatMap(g=>g.codes));
   const rest=Object.keys(byCode).filter(c=>!used.has(c)); if(rest.length) MAPG[MAPG.length-1].codes.push(...rest.filter(c=>!MAPG[MAPG.length-1].codes.includes(c)));
-  const chip=m=>`<button class="vc-chip r${ringOf(m.id)}" data-go="${esc(m.id)}" title="${esc(m.n)} · ${esc(m.city)}" style="--c:var(--seg-${esc(m.s)})"><span class="d"></span>${esc(m.short)}</button>`;
+  const chip=m=>`<button class="vc-chip r${ringOf(m.id)}${(m.ipcei||[]).length?' ipc':''}" data-go="${esc(m.id)}" title="${esc(m.n)} · ${esc(m.city)}${(m.ipcei||[]).length?' · IPCEI '+m.ipcei.map(x=>x.p+' '+x.y).join(', '):''}" style="--c:var(--seg-${esc(m.s)})"><span class="d"></span>${esc(m.short)}${(m.ipcei||[]).length?' <span class="ipcm">IPCEI</span>':''}</button>`;
   $('vcflow').innerHTML=`<b>${esc(t.flow)}:</b>`+MAPG.filter(g=>!g.wide).map(g=>`<span>${esc(L(g.t))}</span>`).join('<span>→</span>');
   $('vcmap').innerHTML=MAPG.map(g=>{const segs=g.codes.filter(c=>byCode[c]); const n=segs.reduce((a,c)=>a+byCode[c].length,0); if(!n) return '';
     return `<div class="vc-stage${g.wide?' wide':''}"><h3>${esc(L(g.t))}</h3><div class="vc-n">${n}</div>`+segs.map(c=>`<div class="vc-seg"><h4><span><code>${esc(c)}</code>${esc(segName(byCode[c][0]))}</span><span>${byCode[c].length}</span></h4><div class="vc-chips">${byCode[c].map(chip).join('')}</div></div>`).join('')+`</div>`;}).join('');
-  $('vclegend').innerHTML=[1,2,4].map((r,i)=>`<span><span class="vc-chip r${r}" style="pointer-events:none;padding:2px 6px"><span class="d"></span>${esc(t.legend[i])}</span></span>`).join('');
+  $('vclegend').innerHTML=[1,2,4].map((r,i)=>`<span><span class="vc-chip r${r}" style="pointer-events:none;padding:2px 6px"><span class="d"></span>${esc(t.legend[i])}</span></span>`).join('')+`<span>${esc(t.ipc)}</span>`;
   $('vcmap').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goMember(b.dataset.go));
 }
 """

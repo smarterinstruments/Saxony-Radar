@@ -16,3 +16,7 @@
 - Nur öffentliche Informationen; keine personenbezogenen Daten von Ansprechpartnern, keine internen Cluster-Informationen.
 
 Korrekturen und Ergänzungen / corrections and additions: info@semicz.cz, Betreff „Radar Sachsen“.
+
+## IPCEI
+
+IPCEI-Beteiligung (Badge auf der Organisationskarte, Marker in der Wertschöpfungskette, Spalte in der Tabelle) stammt ausschließlich aus öffentlichen Quellen: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023), BMWK-Erläuterungspapier zum ersten IPCEI Mikroelektronik, Entscheidungen der Europäischen Kommission (IP/18/6862, IP/23/3087). IPCEI AST ist nicht enthalten. / IPCEI participation comes from public sources only; IPCEI AST is not included.

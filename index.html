@@ -1291,30 +1291,54 @@ function renderRadar() {
       });
     });
   });
-  // labels: horizontal text next to the dot; overlapping labels are nudged apart vertically (same side, overlapping x-range)
-  const labels = dots.map(d => { const right = Math.cos(Math.atan2(d.y - CY, d.x - C)) >= 0; const w = d.m.short.length * 7.8 + 6; return {d, right, x: d.x + (right ? 12 : -12), y: d.y + 5, w, h: 16}; });
-  // other members' dots are fixed obstacles for a label (box around the dot, in label coordinates: y = baseline)
-  const items = labels.concat(dots.map(d => ({d, fixed: true, x0: d.x - 10, x1: d.x + 10, y: d.y + 5, h: 20})));
-  const xr = o => o.fixed ? [o.x0, o.x1] : (o.right ? [o.x, o.x + o.w] : [o.x - o.w, o.x]);
-  for (let it = 0; it < 10; it++) {
-    items.sort((p, q) => p.y - q.y);
-    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
-      const A = items[i], B = items[j]; if (B.y - A.y >= Math.max(A.h, B.h)) break;
-      if (A.fixed && B.fixed) continue;
-      if (!A.fixed && !B.fixed && A.d === B.d) continue;
-      if ((A.fixed && A.d === B.d) || (B.fixed && B.d === A.d)) continue;  // a label may sit next to its own dot
-      const [ax0, ax1] = xr(A), [bx0, bx1] = xr(B);
-      if (ax1 < bx0 || bx1 < ax0) continue;
-      const need = (A.h + B.h) / 2 - (B.y - A.y) + 0.5;
-      if (A.fixed) B.y += need; else if (B.fixed) A.y -= need; else { A.y -= need / 2; B.y += need / 2; }
+  // labels: greedy placement without overlaps (candidates around the dot; obstacles = other dots, placed labels, sector labels, canvas edge), then a repair pass
+  const LH = 17;
+  const _cv = document.createElement('canvas').getContext('2d'); _cv.font = '600 14px Inter, sans-serif';
+  const tw = s => { try { return Math.max(_cv.measureText(s).width, s.length * 6.5) + 4; } catch (e) { return s.length * 7.6 + 4; } };
+  const secRects = segs.map(s => { const [a0, a1] = span[s.id]; const m = (a0 + a1) / 2, lr = R[2] + 18, x = C + lr * Math.cos(m), y = CY + lr * Math.sin(m); const anc = Math.abs(Math.cos(m)) < .25 ? 'middle' : (Math.cos(m) > 0 ? 'start' : 'end'); const yoff = Math.abs(Math.cos(m)) < .25 ? (Math.sin(m) < 0 ? -8 : 18) : 6; const w = (s.code + ' ' + L(s)).length * 9.4; const x0 = anc === 'start' ? x : anc === 'end' ? x - w : x - w / 2; return {x0, x1: x0 + w, y0: y + yoff - 17, y1: y + yoff + 5}; });
+  const dotRects = dots.map(d => ({x0: d.x - 11, x1: d.x + 11, y0: d.y - 11, y1: d.y + 11, d}));
+  const hit = (r, q) => !(r.x1 <= q.x0 || q.x1 <= r.x0 || r.y1 <= q.y0 || q.y1 <= r.y0);
+  const candsFor = (d, wide) => {
+    const outward = Math.cos(Math.atan2(d.y - CY, d.x - C)) >= 0;
+    const side = outward ? 'start' : 'end', other = outward ? 'end' : 'start', sx = outward ? 13 : -13;
+    const c = [];
+    const push = (dx, dy, anc) => c.push({dx, dy, anc});
+    push(sx, 5, side); push(-sx, 5, other); push(0, -15, 'middle'); push(0, 25, 'middle');
+    [13, 26, 39].forEach(k => { push(sx, 5 - k, side); push(sx, 5 + k, side); push(-sx, 5 - k, other); push(-sx, 5 + k, other); push(0, -15 - k, 'middle'); push(0, 25 + k, 'middle'); });
+    if (wide) [52, 65, 78, 91, 104].forEach(k => { push(sx, 5 - k, side); push(sx, 5 + k, side); push(-sx, 5 - k, other); push(-sx, 5 + k, other); push(0, -15 - k, 'middle'); push(0, 25 + k, 'middle'); [26, 40].forEach(e => { push(sx + (outward ? e : -e), 5 - k, side); push(sx + (outward ? e : -e), 5 + k, side); }); });
+    return c;
+  };
+  const rectOf = (d, c, w) => { const x = d.x + c.dx, y = d.y + c.dy; const x0 = c.anc === 'start' ? x : c.anc === 'end' ? x - w : x - w / 2; return {x0: x0 - 1, x1: x0 + w + 1, y0: y - 13, y1: y + 4, x, y}; };
+  const inBounds = r => r.x0 >= 2 && r.x1 <= W - 2 && r.y0 >= 2 && r.y1 <= H - 2;
+  const labels = [];
+  const choose = (d, w, others, wide) => {
+    let best = null, bestScore = Infinity; const cs = candsFor(d, wide);
+    for (let ci = 0; ci < cs.length; ci++) {
+      const r = rectOf(d, cs[ci], w); if (!inBounds(r)) continue;
+      let bad = 0;
+      for (const q of dotRects) if (q.d !== d && hit(r, q)) bad += 4;
+      for (const q of others) if (hit(r, q)) bad += 4;
+      for (const q of secRects) if (hit(r, q)) bad += 2;
+      const score = bad * 1000 + ci;
+      if (score < bestScore) { bestScore = score; best = {c: cs[ci], r}; }
+      if (bad === 0) break;
     }
+    return {best, clash: bestScore >= 1000};
+  };
+  const order = dots.slice().sort((p, q) => p.ring - q.ring || Math.hypot(p.x - C, p.y - CY) - Math.hypot(q.x - C, q.y - CY));
+  order.forEach(d => { const w = tw(d.m.short); const {best, clash} = choose(d, w, labels.map(l => l.r), false); labels.push({d, w, r: best.r, c: best.c, clash}); });
+  for (let pass = 0; pass < 3; pass++) {
+    let fixedAny = false;
+    labels.forEach(l => { if (!l.clash) return; const others = labels.filter(o => o !== l).map(o => o.r); const {best, clash} = choose(l.d, l.w, others, true); l.r = best.r; l.c = best.c; l.clash = clash; if (!clash) fixedAny = true; });
+    if (!fixedAny) break;
   }
+  labels.forEach(l => { l.x = l.r.x; l.y = l.r.y; l.anchor = l.c.anc; l.right = l.c.anc === 'start'; l.moved = !(l.c.dy === 5 && Math.abs(l.c.dx) === 13); });
   labels.forEach(l => {
     const d = l.d;
     h += `<g class="dot" data-id="${d.m.id}" style="cursor:pointer">`;
-    if (Math.abs(l.y - (d.y + 5)) > 7) h += `<line x1="${d.x.toFixed(1)}" y1="${d.y.toFixed(1)}" x2="${(l.x + (l.right ? -3 : 3)).toFixed(1)}" y2="${(l.y - 4).toFixed(1)}" stroke="#5d6677" stroke-width="1"/>`;
+    if (l.moved) { const ex = l.anchor === 'middle' ? l.x : (l.x + (l.anchor === 'start' ? -3 : 3)); const ey = l.y > d.y ? l.y - 12 : l.y + 3; h += `<line x1="${d.x.toFixed(1)}" y1="${d.y.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#5d6677" stroke-width="1"/>`; }
     h += `<circle cx="${d.x.toFixed(1)}" cy="${d.y.toFixed(1)}" r="8" fill="${segColor(d.s.id)}" stroke="#0d121a" stroke-width="2"/>`;
-    h += `<text x="${l.x.toFixed(1)}" y="${l.y.toFixed(1)}" text-anchor="${l.right ? 'start' : 'end'}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;
+    h += `<text x="${l.x.toFixed(1)}" y="${l.y.toFixed(1)}" text-anchor="${l.anchor}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;
   });
   h += '</svg>';
   $('radarSvg').innerHTML = h;

@@ -20,3 +20,7 @@ Korrekturen und Ergänzungen / corrections and additions: info@semicz.cz, Betref
 ## IPCEI
 
 IPCEI-Beteiligung (Badge auf der Organisationskarte, Marker in der Wertschöpfungskette, Spalte in der Tabelle) stammt ausschließlich aus öffentlichen Quellen: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023), BMWK-Erläuterungspapier zum ersten IPCEI Mikroelektronik, Entscheidungen der Europäischen Kommission (IP/18/6862, IP/23/3087). IPCEI AST ist nicht enthalten. / IPCEI participation comes from public sources only; IPCEI AST is not included.
+
+## Qualitätsprüfung / quality check
+
+`python3 tools/check_labels.py index.html` prüft im Headless-Browser, dass sich im Radar keine Beschriftungen überlappen (Labels untereinander, mit Sektorbeschriftungen und mit Punkten), für DE, EN und CZ; erwartetes Ergebnis: `overlaps 0`. / Headless check that no radar labels overlap; expected result `overlaps 0`.

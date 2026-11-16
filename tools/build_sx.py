@@ -127,6 +127,60 @@ T=T.replace("</style>",".chip.src[href]{cursor:pointer}.chip.src[href]:hover{tex
 OLD_LI="m.li ? `<a href=\"https://www.linkedin.com/${esc(m.li)}/\" target=\"_blank\" rel=\"noopener\">${esc(t.li)} ↗</a>` : ''"
 assert OLD_LI in T
 T=T.replace(OLD_LI,OLD_LI+", m.yt ? `<a href=\"https://www.youtube.com/channel/${esc(m.yt)}\" target=\"_blank\" rel=\"noopener\">YouTube ↗</a>` : ''",1)
+
+# ---- radar label placement without overlaps ----
+a=T.index("  // labels: horizontal text next to the dot;")
+z=T.index("  labels.forEach(l => {")
+NEW_LABELS=r"""  // labels: greedy placement without overlaps (candidates around the dot; obstacles = other dots, placed labels, sector labels, canvas edge), then a repair pass
+  const LH = 17;
+  const _cv = document.createElement('canvas').getContext('2d'); _cv.font = '600 14px Inter, sans-serif';
+  const tw = s => { try { return Math.max(_cv.measureText(s).width, s.length * 6.5) + 4; } catch (e) { return s.length * 7.6 + 4; } };
+  const secRects = segs.map(s => { const [a0, a1] = span[s.id]; const m = (a0 + a1) / 2, lr = R[2] + 18, x = C + lr * Math.cos(m), y = CY + lr * Math.sin(m); const anc = Math.abs(Math.cos(m)) < .25 ? 'middle' : (Math.cos(m) > 0 ? 'start' : 'end'); const yoff = Math.abs(Math.cos(m)) < .25 ? (Math.sin(m) < 0 ? -8 : 18) : 6; const w = (s.code + ' ' + L(s)).length * 9.4; const x0 = anc === 'start' ? x : anc === 'end' ? x - w : x - w / 2; return {x0, x1: x0 + w, y0: y + yoff - 17, y1: y + yoff + 5}; });
+  const dotRects = dots.map(d => ({x0: d.x - 11, x1: d.x + 11, y0: d.y - 11, y1: d.y + 11, d}));
+  const hit = (r, q) => !(r.x1 <= q.x0 || q.x1 <= r.x0 || r.y1 <= q.y0 || q.y1 <= r.y0);
+  const candsFor = (d, wide) => {
+    const outward = Math.cos(Math.atan2(d.y - CY, d.x - C)) >= 0;
+    const side = outward ? 'start' : 'end', other = outward ? 'end' : 'start', sx = outward ? 13 : -13;
+    const c = [];
+    const push = (dx, dy, anc) => c.push({dx, dy, anc});
+    push(sx, 5, side); push(-sx, 5, other); push(0, -15, 'middle'); push(0, 25, 'middle');
+    [13, 26, 39].forEach(k => { push(sx, 5 - k, side); push(sx, 5 + k, side); push(-sx, 5 - k, other); push(-sx, 5 + k, other); push(0, -15 - k, 'middle'); push(0, 25 + k, 'middle'); });
+    if (wide) [52, 65, 78, 91, 104].forEach(k => { push(sx, 5 - k, side); push(sx, 5 + k, side); push(-sx, 5 - k, other); push(-sx, 5 + k, other); push(0, -15 - k, 'middle'); push(0, 25 + k, 'middle'); [26, 40].forEach(e => { push(sx + (outward ? e : -e), 5 - k, side); push(sx + (outward ? e : -e), 5 + k, side); }); });
+    return c;
+  };
+  const rectOf = (d, c, w) => { const x = d.x + c.dx, y = d.y + c.dy; const x0 = c.anc === 'start' ? x : c.anc === 'end' ? x - w : x - w / 2; return {x0: x0 - 1, x1: x0 + w + 1, y0: y - 13, y1: y + 4, x, y}; };
+  const inBounds = r => r.x0 >= 2 && r.x1 <= W - 2 && r.y0 >= 2 && r.y1 <= H - 2;
+  const labels = [];
+  const choose = (d, w, others, wide) => {
+    let best = null, bestScore = Infinity; const cs = candsFor(d, wide);
+    for (let ci = 0; ci < cs.length; ci++) {
+      const r = rectOf(d, cs[ci], w); if (!inBounds(r)) continue;
+      let bad = 0;
+      for (const q of dotRects) if (q.d !== d && hit(r, q)) bad += 4;
+      for (const q of others) if (hit(r, q)) bad += 4;
+      for (const q of secRects) if (hit(r, q)) bad += 2;
+      const score = bad * 1000 + ci;
+      if (score < bestScore) { bestScore = score; best = {c: cs[ci], r}; }
+      if (bad === 0) break;
+    }
+    return {best, clash: bestScore >= 1000};
+  };
+  const order = dots.slice().sort((p, q) => p.ring - q.ring || Math.hypot(p.x - C, p.y - CY) - Math.hypot(q.x - C, q.y - CY));
+  order.forEach(d => { const w = tw(d.m.short); const {best, clash} = choose(d, w, labels.map(l => l.r), false); labels.push({d, w, r: best.r, c: best.c, clash}); });
+  for (let pass = 0; pass < 3; pass++) {
+    let fixedAny = false;
+    labels.forEach(l => { if (!l.clash) return; const others = labels.filter(o => o !== l).map(o => o.r); const {best, clash} = choose(l.d, l.w, others, true); l.r = best.r; l.c = best.c; l.clash = clash; if (!clash) fixedAny = true; });
+    if (!fixedAny) break;
+  }
+  labels.forEach(l => { l.x = l.r.x; l.y = l.r.y; l.anchor = l.c.anc; l.right = l.c.anc === 'start'; l.moved = !(l.c.dy === 5 && Math.abs(l.c.dx) === 13); });
+"""
+T=T[:a]+NEW_LABELS+T[z:]
+OLD_LINE="""    if (Math.abs(l.y - (d.y + 5)) > 7) h += `<line x1="${d.x.toFixed(1)}" y1="${d.y.toFixed(1)}" x2="${(l.x + (l.right ? -3 : 3)).toFixed(1)}" y2="${(l.y - 4).toFixed(1)}" stroke="#5d6677" stroke-width="1"/>`;"""
+assert OLD_LINE in T
+T=T.replace(OLD_LINE,"""    if (l.moved) { const ex = l.anchor === 'middle' ? l.x : (l.x + (l.anchor === 'start' ? -3 : 3)); const ey = l.y > d.y ? l.y - 12 : l.y + 3; h += `<line x1="${d.x.toFixed(1)}" y1="${d.y.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#5d6677" stroke-width="1"/>`; }""")
+OLD_TXT="""text-anchor="${l.right ? 'start' : 'end'}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;"""
+assert OLD_TXT in T
+T=T.replace(OLD_TXT,"""text-anchor="${l.anchor}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;""")
 # ---- value-chain map tab ----
 T=T.replace("tabs:['Přehled','Novinky',","tabs:['Přehled','Mapa hodnotového řetězce','Novinky',",1)
 T=T.replace("tabs:['Overview','News',","tabs:['Overview','Value chain map','News',",1)

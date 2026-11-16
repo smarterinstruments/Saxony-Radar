@@ -1,4 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}:root{--seg-software:var(--seg-apps);--seg-metrology:var(--seg-test);--seg-subsystems:var(--seg-eco);--seg-distribution:var(--seg-research);--seg-downstream:#64748B;--seg-ecosystem:#0891B2}
+.rk .w a.wk{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)}.rk .w a.wk:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .chip.src[href]{cursor:pointer}.chip.src[href]:hover{text-decoration:underline}
 .vcmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:start}
 .vc-stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px 12px;min-width:0}
@@ -1270,7 +1271,7 @@ function renderRadar() {
   });
   const quietN = D.members.filter(m => ringOf(m.id) > 2).length;
   const levels = D.rings.filter(r => r.n <= 2).map(r => {
-    const who = D.members.filter(m => ringOf(m.id) === r.n).map(m => m.short);
+    const who = D.members.filter(m => ringOf(m.id) === r.n).sort((a,b)=>a.short.localeCompare(b.short)).map(m => `<a href="#member-${esc(m.id)}" data-go="${esc(m.id)}" class="wk" title="${esc(m.n)}">${esc(m.short)}</a>`);
     const w = who.length ? who.join(', ') : `<span style="color:var(--faint)">${esc(t.none)}</span>`;
     return `<div class="rk" style="--c:${ringColor(r.n)}"><div class="n">${esc(t.level)} ${r.n} · ${esc(L({cs:r.desc_cs,en:r.desc_en,de:r.desc_de,nl:r.desc_nl,zh:r.desc_zh}))}</div><div class="t">${esc(L(r))}</div><div class="w">${w}</div></div>`;
   }).join('');
@@ -1279,6 +1280,7 @@ function renderRadar() {
     t.legend.map(([k, v]) => `<div class="li"><b>${esc(k)}</b> ${esc(v)}</div>`).join('') +
     `<div class="li"><b>${esc(t.legendQuiet)}</b> ${quietN} ${esc(t.legendQuiet2)}</div><div class="seglist">${seglist}</div></div>`;
   $('seglist').innerHTML = '';
+  $('key').querySelectorAll('[data-go]').forEach(a => a.onclick = e => { e.preventDefault(); goMember(a.dataset.go); });
 }
 
 function renderCentres() {

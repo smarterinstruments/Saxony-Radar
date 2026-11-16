@@ -99,6 +99,14 @@ body=('{\n'+'\n'.join(parts)+'\n}').replace('</','<\\/')
 for a,c in [("L({cs: n.cs, en: n.en})","L({cs:n.cs,en:n.en,de:n.de})"),("L({cs:m.cs,en:m.en})","L({cs:m.cs,en:m.en,de:m.de})"),("L({cs:e.cs, en:e.en})","L({cs:e.cs,en:e.en,de:e.de})"),("L({cs:n.cs,en:n.en})","L({cs:n.cs,en:n.en,de:n.de})")]:
     assert a in T, a
     T=T.replace(a,c)
+# ---- clickable organisation names in the overview level boxes ----
+OLD_WHO="const who = D.members.filter(m => ringOf(m.id) === r.n).map(m => m.short);"
+assert OLD_WHO in T
+T=T.replace(OLD_WHO,"const who = D.members.filter(m => ringOf(m.id) === r.n).sort((a,b)=>a.short.localeCompare(b.short)).map(m => `<a href=\"#member-${esc(m.id)}\" data-go=\"${esc(m.id)}\" class=\"wk\" title=\"${esc(m.n)}\">${esc(m.short)}</a>`);",1)
+OLD_KEY="  $('seglist').innerHTML = '';\n}"
+assert OLD_KEY in T
+T=T.replace(OLD_KEY,"  $('seglist').innerHTML = '';\n  $('key').querySelectorAll('[data-go]').forEach(a => a.onclick = e => { e.preventDefault(); goMember(a.dataset.go); });\n}",1)
+T=T.replace("</style>",".rk .w a.wk{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line2)}.rk .w a.wk:hover{color:var(--accent);border-bottom-color:var(--accent)}\n</style>",1)
 # ---- clickable source chips (LinkedIn page / YouTube channel / episode) ----
 OLD_SRC="if (n.src && srcById[n.src]) h += `<span class=\"chip src\">${esc(L(srcById[n.src]))}</span>`;"
 assert OLD_SRC in T

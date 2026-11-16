@@ -99,6 +99,12 @@ body=('{\n'+'\n'.join(parts)+'\n}').replace('</','<\\/')
 for a,c in [("L({cs: n.cs, en: n.en})","L({cs:n.cs,en:n.en,de:n.de})"),("L({cs:m.cs,en:m.en})","L({cs:m.cs,en:m.en,de:m.de})"),("L({cs:e.cs, en:e.en})","L({cs:e.cs,en:e.en,de:e.de})"),("L({cs:n.cs,en:n.en})","L({cs:n.cs,en:n.en,de:n.de})")]:
     assert a in T, a
     T=T.replace(a,c)
+# ---- clickable source chips (LinkedIn page / YouTube channel / episode) ----
+OLD_SRC="if (n.src && srcById[n.src]) h += `<span class=\"chip src\">${esc(L(srcById[n.src]))}</span>`;"
+assert OLD_SRC in T
+NEW_SRC="if (n.src && srcById[n.src]) { const m0 = ms[0]; let href = ''; if (n.src === 'linkedin' && m0 && m0.li) href = 'https://www.linkedin.com/' + m0.li + '/'; else if (n.src === 'youtube' && m0 && m0.yt) href = 'https://www.youtube.com/channel/' + m0.yt; else if (n.u) href = n.u; h += href ? `<a class=\"chip src\" href=\"${esc(href)}\" target=\"_blank\" rel=\"noopener\" title=\"${esc(href)}\">${esc(L(srcById[n.src]))} ↗</a>` : `<span class=\"chip src\">${esc(L(srcById[n.src]))}</span>`; }"
+T=T.replace(OLD_SRC,NEW_SRC,1)
+T=T.replace("</style>",".chip.src[href]{cursor:pointer}.chip.src[href]:hover{text-decoration:underline}\n</style>",1)
 # ---- YouTube link on member cards ----
 OLD_LI="m.li ? `<a href=\"https://www.linkedin.com/${esc(m.li)}/\" target=\"_blank\" rel=\"noopener\">${esc(t.li)} ↗</a>` : ''"
 assert OLD_LI in T

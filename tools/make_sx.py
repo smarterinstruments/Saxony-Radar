@@ -69,6 +69,13 @@ IPCEI={
 }
 BO=json.load(open('data/cnsc_research_overrides.json')); OV=BO['ov']
 CONF_MAP={'high':'H','to verify':'M','uncertain':'L'}
+def card(code,name,o2,label):
+    t=f"{code} {name}."
+    if o2 and o2.get('profile'):
+        t+=" "+o2['profile'].strip()
+        if not t.endswith(('.', '!', '?')): t+='.'
+        if o2.get('products'): t+=f" {label}: {o2['products'].strip()}"
+    return t
 members=[]; ids=set(); byname={}
 rows=list(ins)+[{'name':'Silicon Saxony e.V.','city':'Dresden','web':'https://silicon-saxony.de','tags':'Cluster|Netzwerk|Standortmarketing','code':'7.3','conf':'H','chip':False,'desc':''}]
 for o in rows:
@@ -100,7 +107,7 @@ for o in rows:
         if o2['conf'] in CONF_MAP: o=dict(o); o['conf']=o2['conf']
         conf={'H':('zařazení ověřeno CNSC','verified by CNSC','von CNSC geprüft'),'M':('zařazení ověřit','segment to verify','Zuordnung zu prüfen'),'L':('zařazení nejisté','segment uncertain','Zuordnung unsicher')}.get(CONF_MAP.get(o2['conf'],(o.get('conf') or 'M')[:1].upper()),conf)
     members.append({"id":i,"n":o['name'],"short":short(o['name']),"city":((o2 and o2.get('city') and not re.search(r"http|www\.",o2['city']) and re.sub(r"\s*/\s*.*$","",o2['city']).split(",")[0].strip()) or (lambda c: '' if re.search(r"http|www\.|\.(de|com|org|net|eu|at|ch)\b",c) else c)(re.sub(r"[^A-Za-zÄÖÜäöüß .\-]","",o.get('city') or '').strip()) or 'Sasko')+" (DE)","url":url((o2 and o2.get('web')) or o.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":(f"{code} {cs_n} ({conf[0]}). {o2['profile']}" + (f" Produkty a služby: {o2['products']}" if o2.get('products') else '')) if (o2 and o2.get('profile')) else f"{code} {cs_n} ({conf[0]}).{kw_cs}{chip}","en":f"{code} {en_n} ({conf[1]}).{kw_en}{chip_en}","de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}).{kw_de}","logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
+        "cs":card(code,cs_n,o2,'Produkty a služby'),"en":card(code,en_n,o2,'Products and services'),"de":card(code,DE_CODE.get(code,en_n),o2,'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}.get(CONF_MAP.get((o2 or {}).get('conf',''),(o.get('conf') or 'M')[:1].upper()),'to verify'),"logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":bool(o2),"ssm":True,"liScope":"page" if li else "","liFilter":"","offer":{},"cc":"DE","ver":1 if o.get('conf')=='H' else 0,"code":code})
 
 # ---- organisations from CNSC research that are not Silicon Saxony members ----
 CODE_FIX={'3.3':'3.2','4.1':'1.3'}
@@ -120,9 +127,7 @@ for e in BO['extra']:
     prof=e.get('profile','') ; prod=e.get('products','')
     yt=''; li=''
     members.append({"id":i,"n":e['name'],"short":short(nm),"city":city+" (DE)","url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
-        "cs":f"{code} {cs_n} ({conf[0]}). {prof}"+(f" Produkty a služby: {prod}" if prod else ''),
-        "en":f"{code} {en_n} ({conf[1]}). Not a Silicon Saxony member; identified by CNSC research.",
-        "de":f"{code} {DE_CODE.get(code,en_n)} ({conf[2]}). Kein Mitglied von Silicon Saxony; durch CNSC-Recherche identifiziert.",
+        "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,e,'Products and services'),"de":card(code,DE_CODE.get(code,en_n),e,'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
         "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"cc":"DE","ver":1 if confk=='H' else 0,"code":code})
 def M(prefix):
     for n,i in byname.items():

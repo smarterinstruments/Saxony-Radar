@@ -76,7 +76,7 @@ JS="""
     const en=LANG==='en';
     const codes={};D.members.forEach(m=>{codes[m.code]=(codes[m.code]||0)+1});
     const order=Object.keys(codes).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-    const nm=c=>{const m=D.members.find(x=>x.code===c);const t=(m?(LANG==='de'?m.de:en?m.en:m.cs):'').replace(/^[^ ]+ /,'').split(' (')[0];return c+' '+t;};
+    const nm=c=>{const m=D.members.find(x=>x.code===c);const t=(m?(LANG==='de'?m.de:en?m.en:m.cs):'').replace(/^[^ ]+ /,'').split('. ')[0].replace(/\\.$/,'');return c+' '+t;};
     bar.innerHTML='<label>'+(en?'Segment: ':'Segment: ')+'<select id="ccSel" style="font:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:inherit;max-width:100%"><option value="">'+(LANG==='de'?'Alle':en?'All':'Všechny')+' ('+D.members.length+')</option><option value="2.4"'+(CC==='2.4'?' selected':'')+'>2.4 '+(LANG==='de'?'Subsysteme und Komponenten (alle)':en?'Subsystems and components (all)':'Subsystémy a komponenty (vše)')+' ('+order.filter(c=>c.startsWith('2.4')).reduce((a,c)=>a+codes[c],0)+')</option>'+order.map(c=>'<option value="'+c+'"'+(c===CC?' selected':'')+'>'+esc(nm(c))+' ('+codes[c]+')</option>').join('')+'</select></label>';
     $('ccSel').onchange=e=>{CC=e.target.value;apply();};
     apply();
@@ -247,7 +247,7 @@ const MAPG=[
  {id:'apps',codes:['6.1','6.2','6.3','6.4','6.5','6.6','D'],t:{cs:'6 Aplikace a distribuce',en:'6 Applications & distribution',de:'6 Anwendungen & Distribution'}},
  {id:'eco',codes:['7.1','7.2','7.3'],wide:true,t:{cs:'7 Výzkum, vzdělávání, politika a klastry',en:'7 Research, skills, policy & clusters',de:'7 Forschung, Bildung, Politik & Cluster'}}];
 let MAPSEL=null;
-function segName(m){ return String(L({cs:m.cs,en:m.en,de:m.de})).replace(/^[^ ]+ /,'').split(' (')[0]; }
+function segName(m){ return String(L({cs:m.cs,en:m.en,de:m.de})).replace(/^[^ ]+ /,'').split('. ')[0].replace(/\.$/,''); }
 function goMember(id){ showTab('members'); const el=document.getElementById('member-'+id); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'center'}); document.querySelectorAll('.card.hl').forEach(c=>c.classList.remove('hl')); el.classList.add('hl'); setTimeout(()=>el.classList.remove('hl'),4000); }
 function renderMap(){
   const t=MAPT[LANG]||MAPT.en; $('mapH').textContent=t.h; $('mapSub').textContent=t.sub;

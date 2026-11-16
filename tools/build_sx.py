@@ -227,7 +227,6 @@ T=T.replace("</style>",MAP_CSS+"</style>",1)
 MAP_HTML="""  <section class="panel" id="p-map" role="tabpanel">
     <h2 id="mapH"></h2>
     <p class="sub" id="mapSub"></p>
-    <div class="vc-flow" id="vcflow"></div>
     <div class="vc-stages" id="vcstages" role="group"></div>
     <div class="vcmap" id="vcmap"></div>
     <div class="vc-legend" id="vclegend"></div>
@@ -257,7 +256,6 @@ function renderMap(){
   const used=new Set(MAPG.flatMap(g=>g.codes));
   const rest=Object.keys(byCode).filter(c=>!used.has(c)); if(rest.length) MAPG[MAPG.length-1].codes.push(...rest.filter(c=>!MAPG[MAPG.length-1].codes.includes(c)));
   const chip=m=>`<button class="vc-chip r${ringOf(m.id)}${(m.ipcei||[]).length?' ipc':''}${m.ssm===false?' nonmem':''}" data-go="${esc(m.id)}" title="${esc(m.n)} · ${esc(m.city)}${(m.ipcei||[]).length?' · IPCEI '+m.ipcei.map(x=>x.p+' '+x.y).join(', '):''}" style="--c:var(--seg-${esc(m.s)})"><span class="d"></span>${esc(m.short)}${(m.ipcei||[]).length?' <span class="ipcm">IPCEI</span>':''}</button>`;
-  $('vcflow').innerHTML=`<b>${esc(t.flow)}:</b>`+MAPG.filter(g=>!g.wide).map(g=>`<span>${esc(L(g.t))}</span>`).join('<span>→</span>');
   const cnt=g=>g.codes.reduce((a,c)=>a+((byCode[c]||[]).length),0);
   $('vcstages').innerHTML=`<button type="button" class="vc-stbtn${MAPSEL?'':' on'}" data-st="">${esc(({cs:'Vše',en:'All',de:'Alle'})[LANG]||'All')}<span class="n">${D.members.length}</span></button>`+MAPG.map(g=>`<button type="button" class="vc-stbtn${MAPSEL===g.id?' on':''}" data-st="${g.id}">${esc(L(g.t))}<span class="n">${cnt(g)}</span></button>`).join('');
   $('vcstages').querySelectorAll('.vc-stbtn').forEach(bt=>bt.onclick=()=>{const v=bt.dataset.st||null; MAPSEL=(MAPSEL===v)?null:v; renderMap();});

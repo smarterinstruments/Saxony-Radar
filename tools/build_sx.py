@@ -181,6 +181,14 @@ T=T.replace(OLD_LINE,"""    if (l.moved) { const ex = l.anchor === 'middle' ? l.
 OLD_TXT="""text-anchor="${l.right ? 'start' : 'end'}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;"""
 assert OLD_TXT in T
 T=T.replace(OLD_TXT,"""text-anchor="${l.anchor}" font-size="14" font-weight="600" fill="#eef1f6" font-family="Inter,sans-serif">${esc(d.m.short)}</text></g>`;""")
+# ---- search covers the map ----
+OLD_RUN="    document.querySelectorAll('nav.tabs button[data-tab]').forEach(b => badge(b.dataset.tab, words.length ? (per[b.dataset.tab] || 0) : 0));"
+assert OLD_RUN in T
+T=T.replace(OLD_RUN,"""    document.querySelectorAll('#vcmap .vc-chip[data-go]').forEach(b => { if (!words.length){ b.classList.remove('qdim'); return; } const m = memById[b.dataset.go]; const n = m && last[m.id]; const txt = norm(m ? [m.n, m.short, m.city, m.code, m.cs, m.en, m.de, n && n.cs, n && n.en, n && n.de].filter(Boolean).join(' ') : ''); const hit = words.every(w => txt.includes(w)); b.classList.toggle('qdim', !hit); if (hit) per.map = (per.map || 0) + 1; });
+    document.querySelectorAll('#vcmap .vc-seg').forEach(s => s.classList.toggle('qhide', !!words.length && !s.querySelector('.vc-chip[data-go]:not(.qdim)')));
+    document.querySelectorAll('#vcmap .vc-stage').forEach(s => s.classList.toggle('qhide', !!words.length && !s.querySelector('.vc-seg:not(.qhide)')));
+"""+OLD_RUN,1)
+T=T.replace("['renderAll', 'renderNews', 'renderRadar'].forEach(wrap);","['renderAll', 'renderNews', 'renderRadar', 'renderMap'].forEach(wrap);",1)
 # ---- value-chain map tab ----
 T=T.replace("tabs:['Přehled','Novinky',","tabs:['Přehled','Mapa hodnotového řetězce','Novinky',",1)
 T=T.replace("tabs:['Overview','News',","tabs:['Overview','Value chain map','News',",1)
@@ -202,6 +210,13 @@ MAP_CSS=""".vcmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(240p
 .vc-chip .d{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--ring4)}
 .vc-chip.r1 .d{background:var(--ring1)}.vc-chip.r2 .d{background:var(--ring2)}
 .vc-chip .ipcm{font:600 9px/1 inherit;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:1px 3px;margin-left:4px;vertical-align:1px}
+.vc-stages{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.vc-stbtn{font:600 12px/1 inherit;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer}
+.vc-stbtn:hover{background:var(--line)}
+.vc-stbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.vc-stbtn .n{opacity:.7;margin-left:5px;font-weight:500}
+#vcmap .vc-chip.qdim{opacity:.12}
+#vcmap .vc-seg.qhide,#vcmap .vc-stage.qhide{display:none}
 .vc-flow{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 12px;color:var(--muted);font-size:12px}
 .vc-flow b{color:inherit;font-weight:600}
 .vc-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:12px 0 0}
@@ -213,6 +228,7 @@ MAP_HTML="""  <section class="panel" id="p-map" role="tabpanel">
     <h2 id="mapH"></h2>
     <p class="sub" id="mapSub"></p>
     <div class="vc-flow" id="vcflow"></div>
+    <div class="vc-stages" id="vcstages" role="group"></div>
     <div class="vcmap" id="vcmap"></div>
     <div class="vc-legend" id="vclegend"></div>
   </section>
@@ -231,6 +247,7 @@ const MAPG=[
  {id:'pack',codes:['5.1','5.2','5.3'],t:{cs:'5 Pouzdření a test',en:'5 Packaging & test',de:'5 Packaging & Test'}},
  {id:'apps',codes:['6.1','6.2','6.3','6.4','6.5','6.6','D'],t:{cs:'6 Aplikace a distribuce',en:'6 Applications & distribution',de:'6 Anwendungen & Distribution'}},
  {id:'eco',codes:['7.1','7.2','7.3'],wide:true,t:{cs:'7 Výzkum, vzdělávání, politika a klastry',en:'7 Research, skills, policy & clusters',de:'7 Forschung, Bildung, Politik & Cluster'}}];
+let MAPSEL=null;
 function segName(m){ return String(L({cs:m.cs,en:m.en,de:m.de})).replace(/^[^ ]+ /,'').split(' (')[0]; }
 function goMember(id){ showTab('members'); const el=document.getElementById('member-'+id); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'center'}); document.querySelectorAll('.card.hl').forEach(c=>c.classList.remove('hl')); el.classList.add('hl'); setTimeout(()=>el.classList.remove('hl'),4000); }
 function renderMap(){
@@ -241,7 +258,10 @@ function renderMap(){
   const rest=Object.keys(byCode).filter(c=>!used.has(c)); if(rest.length) MAPG[MAPG.length-1].codes.push(...rest.filter(c=>!MAPG[MAPG.length-1].codes.includes(c)));
   const chip=m=>`<button class="vc-chip r${ringOf(m.id)}${(m.ipcei||[]).length?' ipc':''}${m.ssm===false?' nonmem':''}" data-go="${esc(m.id)}" title="${esc(m.n)} · ${esc(m.city)}${(m.ipcei||[]).length?' · IPCEI '+m.ipcei.map(x=>x.p+' '+x.y).join(', '):''}" style="--c:var(--seg-${esc(m.s)})"><span class="d"></span>${esc(m.short)}${(m.ipcei||[]).length?' <span class="ipcm">IPCEI</span>':''}</button>`;
   $('vcflow').innerHTML=`<b>${esc(t.flow)}:</b>`+MAPG.filter(g=>!g.wide).map(g=>`<span>${esc(L(g.t))}</span>`).join('<span>→</span>');
-  $('vcmap').innerHTML=MAPG.map(g=>{const segs=g.codes.filter(c=>byCode[c]); const n=segs.reduce((a,c)=>a+byCode[c].length,0); if(!n) return '';
+  const cnt=g=>g.codes.reduce((a,c)=>a+((byCode[c]||[]).length),0);
+  $('vcstages').innerHTML=`<button type="button" class="vc-stbtn${MAPSEL?'':' on'}" data-st="">${esc(({cs:'Vše',en:'All',de:'Alle'})[LANG]||'All')}<span class="n">${D.members.length}</span></button>`+MAPG.map(g=>`<button type="button" class="vc-stbtn${MAPSEL===g.id?' on':''}" data-st="${g.id}">${esc(L(g.t))}<span class="n">${cnt(g)}</span></button>`).join('');
+  $('vcstages').querySelectorAll('.vc-stbtn').forEach(bt=>bt.onclick=()=>{const v=bt.dataset.st||null; MAPSEL=(MAPSEL===v)?null:v; renderMap();});
+  $('vcmap').innerHTML=MAPG.filter(g=>!MAPSEL||g.id===MAPSEL).map(g=>{const segs=g.codes.filter(c=>byCode[c]); const n=segs.reduce((a,c)=>a+byCode[c].length,0); if(!n) return '';
     return `<div class="vc-stage${g.wide?' wide':''}"><h3>${esc(L(g.t))}</h3><div class="vc-n">${n}</div>`+segs.map(c=>`<div class="vc-seg"><h4><span><code>${esc(c)}</code>${esc(segName(byCode[c][0]))}</span><span>${byCode[c].length}</span></h4><div class="vc-chips">${byCode[c].map(chip).join('')}</div></div>`).join('')+`</div>`;}).join('');
   $('vclegend').innerHTML=[1,2,4].map((r,i)=>`<span><span class="vc-chip r${r}" style="pointer-events:none;padding:2px 6px"><span class="d"></span>${esc(t.legend[i])}</span></span>`).join('')+`<span>${esc(t.ipc)}</span>`;
   $('vcmap').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goMember(b.dataset.go));

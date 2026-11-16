@@ -11,7 +11,7 @@
 
 ## Stand / status (Ausgabe W46/2026, 15. 11. 2026)
 
-- 481 Organisationen aus dem öffentlichen Mitgliederverzeichnis von Silicon Saxony, davon 325 durch CNSC-Recherche geprüft (Website, Segment, Kurzprofil), zugeordnet zu 27 Codes der CNSC-Taxonomie der Wertschöpfungskette (10 Sektoren, Untersegmente 2.4.1–2.4.6). Die Zuordnung ist vorläufig und wartet auf die Bestätigung durch Silicon Saxony.
+- 536 Organisationen: 481 Mitglieder von Silicon Saxony (öffentliches Mitgliederverzeichnis) und 55 Nichtmitglieder aus CNSC-Recherche (gestrichelt markiert, Merkmal „Silicon Saxony member“); 380 davon durch CNSC-Recherche geprüft (Website, Segment, Kurzprofil); zugeordnet zu 27 Codes der CNSC-Taxonomie der Wertschöpfungskette (10 Sektoren, Untersegmente 2.4.1–2.4.6). Die Zuordnung ist vorläufig und wartet auf die Bestätigung durch Silicon Saxony.
 - 68 Meldungen und 5 Termine, bisher von den öffentlichen LinkedIn-Seiten (33) und YouTube-Kanälen (22, über öffentliche RSS-Feeds) ausgewählter Unternehmen und Institute sowie dem wöchentlichen Silicon-Saxony-Podcast „What's Chippening“ (Folgen 87–95, je eine Meldung mit Verweisen auf die genannten sächsischen Organisationen). Alle Meldungstexte sind eigene Zusammenfassungen, keine Zitate.
 - Nur öffentliche Informationen; keine personenbezogenen Daten von Ansprechpartnern, keine internen Cluster-Informationen.
 

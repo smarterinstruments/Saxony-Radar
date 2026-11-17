@@ -57,22 +57,30 @@ SX_MECT='https://www.medienservice.sachsen.de/medien/news/1069594'
 EC_MECT='https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087'
 EC_ME='https://ec.europa.eu/commission/presscorner/detail/en/IP_18_6862'
 BMWK_ME='https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Downloads/M-O/staerkung-mikroelektronik-standort-deutschland-europa-erlaeuterungspapier.pdf'
+BMWE_AST='https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Artikel/Industrie/mikroelektronik.html'  # Beteiligte deutsche Unternehmen IPCEI AST, Stand 30.06.2026 (vorgesehen; Pränotifizierung von 14 Projekten 1.7.2026)
+AST_S='vorgesehen · BMWE-Liste 30.06.2026'
 IPCEI={
- 'GlobalFoundries Dresden':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
- 'Infineon Technologies Dresden':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
- 'Robert Bosch Semiconductor':[('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'GlobalFoundries Dresden':[('AST',2026,'Dresden · '+AST_S,BMWE_AST),('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'Infineon Technologies Dresden':[('AST',2026,'Dresden · '+AST_S,BMWE_AST),('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
+ 'Robert Bosch Semiconductor':[('AST',2026,'Dresden · '+AST_S,BMWE_AST),('ME/CT',2023,'Dresden',SX_MECT),('ME',2018,'Dresden',BMWK_ME)],
  'Bosch Sensortec':[('ME/CT',2023,'Dresden',SX_MECT)],
- 'Ferroelectric Memory':[('ME/CT',2023,'Dresden',SX_MECT)],
+ 'Ferroelectric Memory':[('AST',2026,'Dresden · '+AST_S,BMWE_AST),('ME/CT',2023,'Dresden',SX_MECT)],
  'Freiberger Compound Materials':[('ME/CT',2023,'Freiberg',SX_MECT)],
  'NXP Semiconductors Germany':[('ME/CT',2023,'Dresden',SX_MECT)],
  'Racyics':[('ME',2018,'Dresden',EC_ME)],
  'Advanced Mask Technology Center':[('ME',2018,'Dresden (assoziiert)',EC_ME)],
  '3D-Micromac':[('ME',2018,'Chemnitz (assoziiert)',EC_ME)],
- 'X-FAB Semiconductor':[('ME/CT',2023,'Erfurt, Itzehoe',EC_MECT),('ME',2018,'Erfurt, Itzehoe',EC_ME)],
+ 'X-FAB Semiconductor':[('AST',2026,'Dresden (X-FAB Dresden GmbH & Co. KG) · '+AST_S,BMWE_AST),('ME/CT',2023,'Erfurt, Itzehoe',EC_MECT),('ME',2018,'Erfurt, Itzehoe',EC_ME)],
  'Applied Materials':[('ME/CT',2023,'Feldkirchen (assoziiert)',EC_MECT)],
  'mi2-factory':[('ME/CT',2023,'Jena',EC_MECT)],
  'ZEISS':[('ME/CT',2023,'Oberkochen',EC_MECT),('ME',2018,'Oberkochen',EC_ME)],
  'Rohde & Schwarz GmbH':[('ME/CT',2023,'München',EC_MECT)],
+ 'Last Mile Semiconductor':[('AST',2026,'Dresden · '+AST_S,BMWE_AST)],
+ 'VON ARDENNE':[('AST',2026,'Dresden · '+AST_S,BMWE_AST)],
+ 'Spiketronix':[('AST',2026,'Dresden · '+AST_S,BMWE_AST)],
+ 'Siltronic':[('AST',2026,'Standort im BMWE-Listing nicht genannt; sächsisches Werk Freiberg · '+AST_S,BMWE_AST)],
+ 'Wacker Chemie':[('AST',2026,'Standort im BMWE-Listing nicht genannt; sächsisches Werk Nünchritz · '+AST_S,BMWE_AST)],
+ 'ELEMENT 3-5':[('AST',2026,'Standort im BMWE-Listing nicht genannt; Entwicklung in Glauchau (Sachsen) · '+AST_S,BMWE_AST)],
 }
 BO=json.load(open('data/cnsc_research_overrides.json')); OV=BO['ov']
 CONF_MAP={'high':'H','to verify':'M','uncertain':'L'}
@@ -183,9 +191,12 @@ for e in BO['extra']:
     city,ccx=place(e.get('city'),'Dresden' if 'Dresden' in e['name'] else '')
     prof=e.get('profile','') ; prod=e.get('products','')
     yt=''; li=''
+    ipc=[]
+    for k,v in IPCEI.items():
+        if e['name'].startswith(k): ipc=[{"p":p,"y":y,"s":site,"u":u} for p,y,site,u in v]
     members.append({"id":i,"n":e['name'],"short":short(nm),"city":city,"cc":ccx,"url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
         "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,tro(i,e,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,e,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
-        "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"ver":1 if confk=='H' else 0,"code":code})
+        "logo":"","li":li,"yt":yt,"ipcei":ipc,"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"ver":1 if confk=='H' else 0,"code":code})
 # ---- city fixes (data/city_fixes.json): verified sites for organisations whose research/profile city was empty or wrong
 CF=json.load(open('data/city_fixes.json',encoding='utf-8'))['fixes']
 _nf=0
@@ -286,6 +297,8 @@ cnt=collections.Counter(m['s'] for m in members); codes=collections.Counter(m['c
 meta=dict(pilot['meta'])
 meta.update({"edition":"W46/2026","updated":"2026-11-16",
  "hub":{"url":"https://smarterinstruments.github.io/","card":"https://smarterinstruments.github.io/sn/","region":"DE-SN"},
+ "esra":{"member":True,"since":2023,"role":"initiator","url":"https://www.esra-org.eu/"},
+ "chipsact":{"foak":2,"foak_list":"ESMC (OEF), Infineon Dresden (IPF)","pilot_lines":4,"pilot_lines_total":11,"pilot_lines_list":"APECS, FAMES, SPINS, SUPREME","ccc":"G3C (national, FMD)","det":2,"det_list":"makeChip DET (Racyics, Dresden), Fraunhofer DET (FMD)","ipcei_ast_entities":8,"ipcei_ast_sites_only":3,"ipcei_ast_source":BMWE_AST},
  "title":{"cs":"Radar polovodičového hodnotového řetězce – Sasko (náhled)","en":"Semiconductor Value Chain Radar – Saxony (preview)","de":"Radar der Halbleiter-Wertschöpfungskette – Sachsen (Vorschau)"},
  "lede":{"cs":"Co firmy saského polovodičového ekosystému každý týden zveřejní, od návrhu čipů přes zařízení, subsystémy a materiály po výrobu, výzkum a distribuci. Seznam firem vychází z veřejného adresáře členů Silicon Saxony a z rešerše CNSC ve veřejných zdrojích; zařazení do segmentů taxonomie CNSC je pracovní a čeká na potvrzení Silicon Saxony.",
   "en":"What companies in the Saxon semiconductor ecosystem publish each week, from chip design through equipment, subsystems and materials to fabrication, research and distribution. The company list comes from the public Silicon Saxony member directory and CNSC research in public sources; the CNSC taxonomy segments are provisional and await confirmation by Silicon Saxony.",
@@ -293,7 +306,7 @@ meta.update({"edition":"W46/2026","updated":"2026-11-16",
  "banner":{"cs":f"Náhled pro Silicon Saxony, edice W46/2026 (16. 11. 2026). {len(members)} organizací, z toho {sum(1 for m in members if m.get('ssm'))} členů Silicon Saxony a {sum(1 for m in members if not m.get('ssm'))} nečlenů z rešerše CNSC. Aktivity ({len(N)} záznamů) zatím jen z LinkedIn stránek a YouTube kanálů {len(set(x for n in N for x in n['m']))} vybraných firem a institucí, sběr 15.–16. 11. 2026; u ostatních firem sběr teprve začíná. Neveřejná pracovní verze.",
   "en":f"Preview for Silicon Saxony, edition W46/2026 (16 Nov 2026). {len(members)} organisations, {sum(1 for m in members if m.get('ssm'))} Silicon Saxony members and {sum(1 for m in members if not m.get('ssm'))} non-members from CNSC research. Activities ({len(N)} entries) so far only from the LinkedIn pages and YouTube channels of {len(set(x for n in N for x in n['m']))} selected companies and institutes, collected 15–16 Nov 2026; collection for the other companies is only starting. Non-public working version.",
   "de":f"Vorschau für Silicon Saxony, Ausgabe W46/2026 (16. 11. 2026). {len(members)} Organisationen, davon {sum(1 for m in members if m.get('ssm'))} Mitglieder von Silicon Saxony und {sum(1 for m in members if not m.get('ssm'))} Nichtmitglieder aus CNSC-Recherche. Aktivitäten ({len(N)} Einträge) bisher nur von den LinkedIn-Seiten und YouTube-Kanälen von {len(set(x for n in N for x in n['m']))} ausgewählten Unternehmen und Instituten, erfasst am 15.–16. 11. 2026; für die übrigen Unternehmen beginnt die Erfassung erst. Nicht öffentliche Arbeitsversion."}})
-src=[["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–16. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"],["IPCEI-Beteiligung: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023) / tisková zpráva Svobodného státu Sasko","https://www.medienservice.sachsen.de/medien/news/1069594"],["IPCEI-Beteiligung: Europäische Kommission, IPCEI Mikroelektronik (IP/18/6862) und IPCEI ME/CT (IP/23/3087); BMWK-Erläuterungspapier","https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087"]]
+src=[["BMWE – Beteiligte deutsche Unternehmen am IPCEI AST (Stand 30.06.2026, vorgesehen) / seznam BMWE účastníků IPCEI AST",BMWE_AST],["ESRA – European Semiconductor Regions Alliance, Mitgliedsregionen / členské regiony (Sachsen = Initiator, 2023)","https://www.esra-org.eu/"],["Silicon Saxony – öffentliches Mitgliederverzeichnis / veřejný adresář členů (734 Profile), 14.–15. 11. 2026","https://silicon-saxony.de/mitglieder/"],["CNSC-Recherche in öffentlichen Quellen / rešerše CNSC (Unternehmenswebsites, Presse, Register), 13.–16. 11. 2026","https://www.semicz.cz"],["LinkedIn-Unternehmensseiten (öffentliche Beiträge) / LinkedIn stránky firem, 15. 11. 2026","https://www.linkedin.com/company/silicon-saxony/"],["YouTube-Kanäle der Unternehmen (öffentliche RSS-Feeds, 22 Kanäle) / YouTube kanály firem, 16. 11. 2026","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["Podcast „What's Chippening“ von Silicon Saxony (wöchentlich, Moderation Julia Nitzschner, Experte Frank Bösenberg), Folgen 87–95 / týdenní podcast Silicon Saxony","https://www.youtube.com/channel/UCeYgs8OL1iLuEAA8nTt83kA"],["CNSC-Taxonomie der Wertschöpfungskette v1.2 (2.4 aufgeteilt am 15. 11. 2026)","https://www.semicz.cz"],["IPCEI-Beteiligung: Pressemitteilung des Freistaats Sachsen zu den neun sächsischen IPCEI-ME/KT-Projekten (2023) / tisková zpráva Svobodného státu Sasko","https://www.medienservice.sachsen.de/medien/news/1069594"],["IPCEI-Beteiligung: Europäische Kommission, IPCEI Mikroelektronik (IP/18/6862) und IPCEI ME/CT (IP/23/3087); BMWK-Erläuterungspapier","https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3087"]]
 TYPES=[dict(t) for t in pilot['types']]+[{"id":"media","cs":"Podcast / video","en":"Podcast / video","de":"Podcast / Video"},{"id":"finance","cs":"Finanční výsledky","en":"Financial results","de":"Finanzergebnisse"}]
 SRCK=[dict(x) for x in pilot['sourcesKinds']]+[{"id":"fair","cs":"Veletrh / konference","en":"Trade fair / conference","de":"Messe / Konferenz"},{"id":"youtube","cs":"YouTube kanál firmy","en":"Company YouTube channel","de":"YouTube-Kanal des Unternehmens"},{"id":"chippening","cs":"Podcast What's Chippening (Silicon Saxony)","en":"What's Chippening podcast (Silicon Saxony)","de":"Podcast What's Chippening (Silicon Saxony)"}]
 for x in SRCK: x.setdefault("de",{"linkedin":"LinkedIn-Unternehmensseite","web":"Unternehmenswebsite","press":"Presse / Medien","member":"vom Unternehmen gemeldet","cnsc":"CNSC-Kanäle"}.get(x["id"],x["en"]))

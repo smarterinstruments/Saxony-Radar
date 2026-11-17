@@ -1,0 +1,515 @@
+{
+ "_note": "City fixes applied by tools/make_sx.py after place(); key = organisation name as in the radar. Source per entry. Remaining without site: IBH Hammer GmbH, hxql solutions GmbH, Kroesus GmbH, Kashiyama Europe GmbH.",
+ "fixes": {
+  "FHR Anlagenbau GmbH": {
+   "city": "Ottendorf-Okrilla",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Nexony GmbH": {
+   "city": "Radeberg",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Last Mile Semiconductor GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "HF – Gaswarntechnologie": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "SPIE Efficient Facilities GmbH": {
+   "city": "München",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Rudolf Gutbrod GmbH": {
+   "city": "Dettingen an der Erms",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "KLA-Tencor GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Chem Reclaim": {
+   "city": "Ouderkerk aan de Amstel",
+   "cc": "NL",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Möbelmanufaktur Rettinghaus GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17 (Langebrück)"
+  },
+  "Crest Technology": {
+   "city": "Livingston",
+   "cc": "GB",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Saxony Thermal LLC.": {
+   "city": "Hillsboro",
+   "cc": "US",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "AMETEK Germany GmbH": {
+   "city": "Meerbusch",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Anlagenbau Austria GmbH": {
+   "city": "Völkermarkt",
+   "cc": "AT",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "ASETS Pte. Ltd": {
+   "city": "Singapore",
+   "cc": "SG",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Caliber Interconnect Solutions Pvt Ltd": {
+   "city": "Coimbatore",
+   "cc": "IN",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Camfil GmbH": {
+   "city": "Strehla",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Carten Controls Ltd.": {
+   "city": "Waterford",
+   "cc": "IE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "e-Paper Innovation Ltd.": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Global Technologies": {
+   "city": "Rousset",
+   "cc": "FR",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "GLOBAL TECHNOLOGIES": {
+   "city": "Rousset",
+   "cc": "FR",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Infraserv Vakuumservice GmbH": {
+   "city": "Eching",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "International Green Technology": {
+   "city": "Courbevoie",
+   "cc": "FR",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "KISCO (Deutschland) GmbH": {
+   "city": "Garching",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Lasertec U.S.A., Inc.": {
+   "city": "Yokohama",
+   "cc": "JP",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "logicBC sp. z o.o.": {
+   "city": "Rybnik",
+   "cc": "PL",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Meliori Polymer Engineering d.o.o.": {
+   "city": "Šibenik",
+   "cc": "HR",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Mercia Semiconductor": {
+   "city": "Tamworth",
+   "cc": "GB",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Photics Nova Technics Inc.": {
+   "city": "Yongin",
+   "cc": "KR",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Rigaku Europe SE": {
+   "city": "Neu-Isenburg",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Rotarex Ceodeux S.A.": {
+   "city": "Roost",
+   "cc": "LU",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Shin-Etsu MicroSi Inc.": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17 (Langebrück)"
+  },
+  "Takenaka Europe GmbH": {
+   "city": "Düsseldorf",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "TegraIC B.V.": {
+   "city": "Eindhoven",
+   "cc": "NL",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Viscom SE": {
+   "city": "Hannover",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Vogelsberger Quarzglastechnik Klaus-Dieter Kindl GmbH": {
+   "city": "Hauzenberg",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Zauner Anlagentechnik GmbH": {
+   "city": "Wallern an der Trattnach",
+   "cc": "AT",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "CrystalSub Group GmbH": {
+   "city": "Kaltenkirchen",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "LOGITEX Reinstmedientechnik GmbH": {
+   "city": "Haimhausen",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Semisol Analytik GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (silicon-saxony.de, Kontakt), checked 2026-11-17"
+  },
+  "Topas GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Baumer Optronic GmbH": {
+   "city": "Radeberg",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "exateq GmbH": {
+   "city": "Neumarkt in der Oberpfalz",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Riebesam GmbH & Co. KG": {
+   "city": "Genthin",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "FaradaIC Sensors GmbH": {
+   "city": "Berlin",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "veonis Technologies GmbH": {
+   "city": "Puchheim",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Axcelis Technologies GmbH": {
+   "city": "Aschheim-Dornach",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Kurt J. Lesker Company GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "NanoelektronikZentrumDresden GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Plasmetrex GmbH": {
+   "city": "Berlin",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Polytec GmbH": {
+   "city": "Waldbronn",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "PTW Europa GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Renesas Design Bingen GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Sachsen-Kälte GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "SIGMA Process & Automation GmbH": {
+   "city": "Goldbach",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "SilcoTek GmbH": {
+   "city": "Bad Homburg",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "THK GmbH": {
+   "city": "Ratingen",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Vacuum World": {
+   "city": "Bucheon",
+   "cc": "KR",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "ViALUX Messtechnik + Bildverarbeitung GmbH": {
+   "city": "Chemnitz",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Viconnis Test Technologie GmbH": {
+   "city": "Hamburg",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "iSAX GmbH & Co. KG": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "Silicon Saxony member profile (city field), 2026-11-15 export"
+  },
+  "Helmholtz-Zentrum Dresden-Rossendorf e. V.": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "city stated in organisation name"
+  },
+  "Leibniz-Institut für Festkörper und Werkstoffforschung Dresden e.V.": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "city stated in organisation name"
+  },
+  "JAT – Jenaer Antriebstechnik GmbH": {
+   "city": "Jena",
+   "cc": "DE",
+   "src": "city stated in organisation name"
+  },
+  "EP Rožnov a.s.": {
+   "city": "Rožnov pod Radhoštěm",
+   "cc": "CZ",
+   "src": "city stated in organisation name"
+  },
+  "Meyer Burger (Germany) GmbH": {
+   "city": "Hohenstein-Ernstthal",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17; insolvent, operations ceased 1 Sep 2025"
+  },
+  "Creaphys GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "SEMRON GmbH": {
+   "city": "Dresden",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Müko Maschinenbau GmbH": {
+   "city": "Weinstadt",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Nikon Precision Europe GmbH": {
+   "city": "Langen",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Kulicke & Soffa Europe": {
+   "city": "Eindhoven",
+   "cc": "NL",
+   "src": "company website / public register, checked 2026-11-17 (K&S Netherlands site)"
+  },
+  "VDE": {
+   "city": "Frankfurt am Main",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "Heraeus Deutschland GmbH & Co. KG": {
+   "city": "Hanau",
+   "cc": "DE",
+   "src": "company website / public register, checked 2026-11-17"
+  },
+  "König & Meyer GmbH & Co. KG": {
+   "city": "Wertheim",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Manz AG": {
+   "city": "Reutlingen",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "MUEGGE GmbH": {
+   "city": "Reichelsheim",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Nichia Chemical Europe GmbH": {
+   "city": "Kronberg im Taunus",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Nihon Parkerizing Co., Ltd.": {
+   "city": "Tokyo",
+   "cc": "JP",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Nordson Deutschland GmbH": {
+   "city": "Erkrath",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Canon Europa N.V.": {
+   "city": "Amstelveen",
+   "cc": "NL",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "EKSPLA": {
+   "city": "Vilnius",
+   "cc": "LT",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "EV Group (EVG)": {
+   "city": "St. Florian am Inn",
+   "cc": "AT",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Cohu GmbH": {
+   "city": "Kolbermoor",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Hesse GmbH": {
+   "city": "Paderborn",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "ZVEI e.V.": {
+   "city": "Frankfurt am Main",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Pro-Micron GmbH": {
+   "city": "Kaufbeuren",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Solvay GmbH": {
+   "city": "Hannover",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "3M Deutschland GmbH": {
+   "city": "Neuss",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Donau Carbon GmbH": {
+   "city": "Frankfurt am Main",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Henkel AG & Co. KGaA": {
+   "city": "Düsseldorf",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Wacker Chemie AG": {
+   "city": "München",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Alpha Ring International Ltd.": {
+   "city": "Monterey",
+   "cc": "US",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "i3 Membrane GmbH": {
+   "city": "Hamburg",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Microdul AG": {
+   "city": "Zürich",
+   "cc": "CH",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "FMD – Forschungsfabrik Mikroelektronik Deutschland": {
+   "city": "Berlin",
+   "cc": "DE",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Altatech Semiconductor S.A. (SOITEC)": {
+   "city": "Montbonnot-Saint-Martin",
+   "cc": "FR",
+   "src": "public headquarters (CNSC research, to be web-checked)"
+  },
+  "Bruco Integrated Circuits": {
+   "city": "Borne",
+   "cc": "NL",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "Electron Mec srl": {
+   "city": "Gorgonzola",
+   "cc": "IT",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "Process Insights – Tiger Optics": {
+   "city": "Horsham (PA)",
+   "cc": "US",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "Spacetek Technology AG": {
+   "city": "Gümligen",
+   "cc": "CH",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "SPS Group BV": {
+   "city": "Putten",
+   "cc": "NL",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "TECHNO HORIZON CO. LTD.": {
+   "city": "Eindhoven",
+   "cc": "NL",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  },
+  "yieldWerx Inc.": {
+   "city": "Plano",
+   "cc": "US",
+   "src": "Silicon Saxony member profile (city field; country code corrected), 2026-11-17"
+  }
+ }
+}

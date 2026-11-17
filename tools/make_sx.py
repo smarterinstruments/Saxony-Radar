@@ -1,5 +1,12 @@
 import json, os, re, unicodedata, collections
-pilot=json.load(open('data/radar.json'))
+# base structures (segments, rings, types, sourcesKinds, meta) come from the CNSC pilot radar when available,
+# otherwise from the previous Saxony edition (the Saxony-specific additions are stripped and re-added below)
+if os.path.exists('data/radar.json'): pilot=json.load(open('data/radar.json'))
+else:
+    pilot=json.load(open('data/radar_sx.json'))
+    pilot['segments']=[x for x in pilot['segments'] if x['id'] not in ('downstream','ecosystem')]
+    pilot['types']=[x for x in pilot['types'] if x['id'] not in ('media','finance')]
+    pilot['sourcesKinds']=[x for x in pilot['sourcesKinds'] if x['id'] not in ('fair','youtube','chippening')]
 fin=json.load(open('/home/claude/sx/final.json'))
 ins=fin['ins'] if isinstance(fin,dict) else fin
 
@@ -179,6 +186,13 @@ for e in BO['extra']:
     members.append({"id":i,"n":e['name'],"short":short(nm),"city":city,"cc":ccx,"url":url(e.get('web')),"s":sec,"acadChip":False,"partnerIn":[],
         "cs":card(code,cs_n,e,'Produkty a služby'),"en":card(code,en_n,tro(i,e,'en'),'Products and services'),"de":card(code,DE_CODE.get(code,en_n),tro(i,e,'de'),'Produkte und Dienstleistungen'),"conf":{'H':'high','M':'to verify','L':'uncertain'}[confk],
         "logo":"","li":li,"yt":yt,"ipcei":[],"note":"","verified":True,"ssm":False,"liScope":"","liFilter":"","offer":{},"ver":1 if confk=='H' else 0,"code":code})
+# ---- city fixes (data/city_fixes.json): verified sites for organisations whose research/profile city was empty or wrong
+CF=json.load(open('data/city_fixes.json',encoding='utf-8'))['fixes']
+_nf=0
+for m in members:
+    f=CF.get(m['n'])
+    if f: m['city']=f"{f['city']} ({f['cc']})"; m['cc']=f['cc']; _nf+=1
+print('city fixes applied',_nf,'of',len(CF))
 def M(prefix):
     for n,i in byname.items():
         if n.startswith(prefix): return i

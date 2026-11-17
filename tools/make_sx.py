@@ -285,6 +285,7 @@ for x in SEG: x['de']=SEG_DE[x['id']]
 cnt=collections.Counter(m['s'] for m in members); codes=collections.Counter(m['code'] for m in members)
 meta=dict(pilot['meta'])
 meta.update({"edition":"W46/2026","updated":"2026-11-16",
+ "hub":{"url":"https://smarterinstruments.github.io/","card":"https://smarterinstruments.github.io/sn/","region":"DE-SN"},
  "title":{"cs":"Radar polovodičového hodnotového řetězce – Sasko (náhled)","en":"Semiconductor Value Chain Radar – Saxony (preview)","de":"Radar der Halbleiter-Wertschöpfungskette – Sachsen (Vorschau)"},
  "lede":{"cs":"Co firmy saského polovodičového ekosystému každý týden zveřejní, od návrhu čipů přes zařízení, subsystémy a materiály po výrobu, výzkum a distribuci. Seznam firem vychází z veřejného adresáře členů Silicon Saxony a z rešerše CNSC ve veřejných zdrojích; zařazení do segmentů taxonomie CNSC je pracovní a čeká na potvrzení Silicon Saxony.",
   "en":"What companies in the Saxon semiconductor ecosystem publish each week, from chip design through equipment, subsystems and materials to fabrication, research and distribution. The company list comes from the public Silicon Saxony member directory and CNSC research in public sources; the CNSC taxonomy segments are provisional and await confirmation by Silicon Saxony.",

@@ -1,0 +1,40 @@
+{
+ "id": "DE-SN",
+ "edition": "W46/2026",
+ "updated": "2026-11-16",
+ "status": "alpha",
+ "title": {
+  "cs": "Radar polovodičového hodnotového řetězce – Sasko (náhled)",
+  "en": "Semiconductor Value Chain Radar – Saxony (preview)",
+  "de": "Radar der Halbleiter-Wertschöpfungskette – Sachsen (Vorschau)"
+ },
+ "url": "https://smarterinstruments.github.io/Saxony-Radar/",
+ "card": "https://smarterinstruments.github.io/sn/",
+ "orgs": 558,
+ "verified": 532,
+ "members": 481,
+ "active31": 28,
+ "active7": 23,
+ "news": 68,
+ "news31": 63,
+ "events": 5,
+ "ipcei": 15,
+ "seg": {
+  "subsystems": 198,
+  "equipment": 79,
+  "ecosystem": 67,
+  "distribution": 47,
+  "materials": 40,
+  "metrology": 38,
+  "fab": 36,
+  "design": 30,
+  "software": 22,
+  "downstream": 1
+ },
+ "langs": [
+  "de",
+  "en",
+  "cs"
+ ],
+ "source": "Public sources only; see the radar's About tab."
+}

@@ -297,6 +297,33 @@ function ecoHtml(m){ const t=ECOT[LANG]||ECOT.en; const e=m.eco; const v=o=>o?(o
 T=T.replace("function renderAll() {",ECO_JS+"function renderAll() {",1)
 T=T.replace("</style>",".eco{margin:4px 0 6px;font-size:12.5px}.eco summary{cursor:pointer;color:var(--accent);font-weight:600;list-style:none}.eco summary::before{content:'+ ';}.eco[open] summary::before{content:'– ';}.eco dl{display:grid;grid-template-columns:6.4em minmax(0,1fr);gap:3px 8px;margin:6px 0 0;align-items:start}.eco dt{color:var(--muted);line-height:1.3}.eco dd{margin:0;min-width:0;overflow-wrap:anywhere;line-height:1.3;font-variant-numeric:tabular-nums}.eco-src{margin:6px 0 0;color:var(--muted);font-size:11.5px;line-height:1.35}.eco-src span{font-weight:600}.chip.eco-rel{margin-left:6px;font-weight:500}.chip.eco-rel.verified{color:var(--ok,#1a7f37);border:1px solid var(--ok,#1a7f37);background:transparent}.chip.eco-rel.estimated,.chip.eco-rel.mixed{color:var(--warn);border:1px solid var(--warn);background:transparent}\n</style>",1)
 assert 'renderMap();' in T and 'id="p-map"' in T and "'map','news'" in T
+
+# --- hub breadcrumb (Global and EU Semiconductor Value Chain Radar > country card > this radar) ---
+T=T.replace('<div class="eyebrow" id="eyebrow"></div>','<nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>\n      <div class="eyebrow" id="eyebrow"></div>',1)
+T=T.replace("</style>",".crumbs{font-size:12.5px;color:var(--muted);margin:0 0 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.crumbs a{color:var(--blue);text-decoration:none;border-bottom:1px solid transparent}.crumbs a:hover{border-bottom-color:var(--blue)}.crumbs span.sep{opacity:.6}\n</style>",1)
+CRUMB_JS="""  if (D.meta.hub && $('crumbs')) { const cl=({cs:'Sasko – karta regionu',en:'Saxony – country card',de:'Sachsen – Regionskarte'})[LANG]||'Saxony – country card'; const rl=({cs:'živý radar',en:'live radar',de:'Live-Radar'})[LANG]||'live radar';
+    $('crumbs').innerHTML = `<a href="${esc(D.meta.hub.url)}">Global and EU Semiconductor Value Chain Radar</a><span class="sep">›</span><a href="${esc(D.meta.hub.card)}">${esc(cl)}</a><span class="sep">›</span><span>${esc(rl)}</span>`; }
+"""
+T=T.replace("  $('eyebrow').textContent = ",CRUMB_JS+"  $('eyebrow').textContent = ",1)
+assert 'id="crumbs"' in T and "D.meta.hub" in T
 html=T.replace('/*__DATA__*/',body)
 open('index.html','w',encoding='utf-8').write(html)
 print(len(html),'companies',len(d['members']),'news',len(d['news']),'events',len(d['events']))
+
+# --- meta.json for the hub (map + country card read this; no organisation-level data) ---
+import datetime, collections
+_upd=datetime.date.fromisoformat(d['meta']['updated'])
+def _age(x):
+    try: return (_upd-datetime.date.fromisoformat(x)).days
+    except Exception: return 10**6
+_news=[n for n in d['news'] if _age(n['d'])<=31]
+_act31=set(m for n in _news for m in n['m']); _act7=set(m for n in _news if _age(n['d'])<=7 for m in n['m'])
+_ids=set(m['id'] for m in d['members'])
+_seg=collections.Counter(m['s'] for m in d['members'])
+_mj={"id":d['meta'].get('hub',{}).get('region','DE-SN'),"edition":d['meta']['edition'],"updated":d['meta']['updated'],"status":d['meta'].get('status','alpha'),
+ "title":d['meta']['title'],"url":"https://smarterinstruments.github.io/Saxony-Radar/","card":d['meta'].get('hub',{}).get('card'),
+ "orgs":len(d['members']),"verified":sum(1 for m in d['members'] if m.get('verified')),"members":sum(1 for m in d['members'] if m.get('ssm')),
+ "active31":len(_act31&_ids),"active7":len(_act7&_ids),"news":len(d['news']),"news31":len(_news),"events":len(d.get('events',[])),"ipcei":sum(1 for m in d['members'] if m.get('ipcei')),
+ "seg":dict(_seg.most_common()),"langs":["de","en","cs"],"source":"Public sources only; see the radar's About tab."}
+json.dump(_mj,open('meta.json','w',encoding='utf-8'),ensure_ascii=False,indent=1)
+print('meta.json',_mj['orgs'],_mj['active31'],_mj['news'])
